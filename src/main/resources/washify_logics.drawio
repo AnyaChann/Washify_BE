@@ -1,0 +1,106 @@
+<mxfile host="65bd71144e">
+    <diagram name="LaundryDB_ERD" id="0">
+        <mxGraphModel dx="1812" dy="469" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="6" value="&lt;b&gt;Orders&lt;/b&gt;&lt;br&gt;order_id (PK) user_id (FK) branch_id (FK) status total_price created_at completed_at" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#FF99CC;strokeColor=#6c8ebf;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="790" width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="102" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="2" target="6" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="103" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="6" target="7" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="105" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="6" target="8" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="106" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="6" target="9" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="107" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="6" target="10" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="108" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="2" target="10" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="109" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="11" target="6" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="110" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="6" target="12" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="115" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 29px;&quot;&gt;Sơ đồ Logic&lt;/font&gt;&amp;nbsp;&lt;/h1&gt;&lt;div&gt;&lt;strong data-end=&quot;92&quot; data-start=&quot;63&quot;&gt;sơ đồ logic (Logical ERD)&lt;/strong&gt; là &lt;strong data-end=&quot;115&quot; data-start=&quot;96&quot;&gt;bước trung gian&lt;/strong&gt; giữa ý tưởng nghiệp vụ và cấu trúc vật lý (bảng thật trong SQL)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;h1 style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); margin-top: 0px;&quot;&gt;&lt;i style=&quot;font-weight: normal;&quot;&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;u&gt;by Bach To&lt;/u&gt;&lt;/font&gt;&lt;/i&gt;&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="-605" y="10" width="180" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="127" value="" style="group;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="110" y="30" width="660" height="580" as="geometry"/>
+                </mxCell>
+                <mxCell id="111" value="" style="group" vertex="1" connectable="0" parent="127">
+                    <mxGeometry y="460" width="660" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="&lt;b&gt;Users&lt;/b&gt;&lt;br&gt;user_id (PK) name email phone password_hash address branch_id (FK) created_at" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#FF3333;strokeColor=#6c8ebf" parent="111" vertex="1">
+                    <mxGeometry width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="&lt;b&gt;Roles&lt;/b&gt;&lt;br&gt;role_id (PK) role_name" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#FF3333;strokeColor=#6c8ebf" parent="111" vertex="1">
+                    <mxGeometry x="480" width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="&lt;b&gt;User_Roles&lt;/b&gt;&lt;br&gt;user_id (FK) role_id (FK)" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#FF3333;strokeColor=#6c8ebf" parent="111" vertex="1">
+                    <mxGeometry x="250" width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="100" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="111" source="2" target="4" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="101" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="111" source="3" target="4" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="122" value="Nhóm người dùng &amp; quyền truy cập&#xa;Users:&#xa;Đại diện cho tất cả người dùng trong hệ thống: khách hàng, nhân viên, admin.&#xa;Các cột chính:&#xa;&#xa;user_id — khóa chính.&#xa;&#xa;name, email, phone, address, password_hash — thông tin cá nhân.&#xa;&#xa;branch_id (FK) — liên kết tới chi nhánh làm việc (đối với nhân viên).&#xa;&#xa;created_at — ngày tạo tài khoản.&#xa;&#xa;&#xa;Roles:&#xa;Định nghĩa vai trò (quyền hạn) trong hệ thống.&#xa;Ví dụ: ADMIN, STAFF, CUSTOMER.&#xa;&#xa;&#xa;User_Roles&#xa;Bảng trung gian để tạo quan hệ N–N giữa Users và Roles (vì 1 người có thể có nhiều vai trò).&#xa;&#xa;&#xa;Quan hệ:&#xa;&#xa;&#xa;Users (1) ↔ (N) User_Roles (N) ↔ (1) Roles" style="text;whiteSpace=wrap;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="127">
+                    <mxGeometry width="530" height="410" as="geometry"/>
+                </mxCell>
+                <mxCell id="128" value="" style="group;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="-610" y="490" width="550" height="500" as="geometry"/>
+                </mxCell>
+                <mxCell id="112" value="" style="group;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" connectable="0" parent="128">
+                    <mxGeometry x="370" width="180" height="500" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="&lt;b&gt;Reviews&lt;/b&gt;&lt;br&gt;review_id (PK) order_id (FK) user_id (FK) rating comment created_at" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" parent="112" vertex="1">
+                    <mxGeometry width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="&lt;b&gt;Branches&lt;/b&gt;&lt;br&gt;branch_id (PK) branch_name address phone" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" parent="112" vertex="1">
+                    <mxGeometry y="200" width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="&lt;b&gt;Promotions&lt;/b&gt;&lt;br&gt;promo_id (PK) code description discount_percent start_date end_date" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" parent="112" vertex="1">
+                    <mxGeometry y="380" width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="124" value="Nhóm phụ trợ &amp; mở rộng&#xa;Reviews:&#xa;Đánh giá dịch vụ sau khi đơn hàng hoàn tất.&#xa;Quan hệ:&#xa;Orders (1) ↔ (0..1) Reviews&#xa;Users (1) ↔ (N) Reviews&#xa;&#xa;&#xa;Branches:&#xa;Chi nhánh tiệm giặt.&#xa;Quan hệ:&#xa;&#xa;Branches (1) ↔ (N) Orders&#xa;Branches (1) ↔ (N) Users (đối với nhân viên).&#xa;&#xa;&#xa;Promotions:&#xa;Mã giảm giá, khuyến mãi.&#xa;Quan hệ:&#xa;&#xa;Orders (N) ↔ (1) Promotions (đơn có thể áp 1 mã).&#xa;Có thể mở rộng thành N:N nếu muốn áp nhiều mã." style="text;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="128">
+                    <mxGeometry width="310" height="340" as="geometry"/>
+                </mxCell>
+                <mxCell id="130" value="" style="group;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="390" y="770" width="990" height="950" as="geometry"/>
+                </mxCell>
+                <mxCell id="113" value="" style="group" vertex="1" connectable="0" parent="130">
+                    <mxGeometry width="460" height="330" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="&lt;b&gt;Services&lt;/b&gt;&lt;br&gt;service_id (PK) name description price_per_unit unit estimated_time" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#6666FF;strokeColor=#6c8ebf" parent="113" vertex="1">
+                    <mxGeometry x="280" width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="&lt;b&gt;Order_Items&lt;/b&gt;&lt;br&gt;order_item_id (PK) order_id (FK) service_id (FK) quantity price" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#6666FF;strokeColor=#6c8ebf" parent="113" vertex="1">
+                    <mxGeometry width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="&lt;b&gt;Payments&lt;/b&gt;&lt;br&gt;payment_id (PK) order_id (FK) payment_method amount status paid_at" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#6666FF;strokeColor=#6c8ebf" parent="113" vertex="1">
+                    <mxGeometry y="210" width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="&lt;b&gt;Shipments&lt;/b&gt;&lt;br&gt;shipment_id (PK) order_id (FK) address status ship_date delivered_at" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#6666FF;strokeColor=#6c8ebf" parent="113" vertex="1">
+                    <mxGeometry x="280" y="210" width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="104" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="113" source="7" target="5" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="123" value="Nhóm dịch vụ &amp;amp; đơn hàng&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;&lt;br&gt;&lt;/font&gt;Services&lt;br&gt;&lt;br&gt;Danh mục các dịch vụ mà tiệm cung cấp.&lt;br&gt;VD: Giặt khô, ủi, giặt theo ký, làm sạch thảm…&lt;br&gt;&lt;br&gt;Các cột:&lt;br&gt;&lt;br&gt;service_id — PK&lt;br&gt;&lt;br&gt;name, description, price_per_unit, unit, estimated_time&lt;br&gt;&lt;br&gt;Orders&lt;br&gt;&lt;br&gt;Đại diện cho 1 đơn hàng của khách (1 lượt gửi đồ).&lt;br&gt;Các cột:&lt;br&gt;&lt;br&gt;order_id — PK&lt;br&gt;&lt;br&gt;user_id (FK) — người đặt (customer).&lt;br&gt;&lt;br&gt;branch_id (FK) — chi nhánh xử lý đơn.&lt;br&gt;&lt;br&gt;status — trạng thái (Pending, Processing, Completed, Cancelled, …).&lt;br&gt;&lt;br&gt;total_price, created_at, completed_at.&lt;br&gt;&lt;br&gt;&lt;br&gt;Quan hệ:&lt;br&gt;&lt;br&gt;1 User có thể có nhiều Orders.&lt;br&gt;1 Branch có nhiều Orders.&lt;br&gt;&lt;br&gt;&lt;br&gt;Order_Items&lt;br&gt;&lt;br&gt;Danh sách chi tiết từng dịch vụ trong đơn (giống line item của hóa đơn).&lt;br&gt;&lt;br&gt;Quan hệ:&lt;br&gt;&lt;br&gt;Orders (1) ↔ (N) Order_Items&lt;br&gt;Services (1) ↔ (N) Order_Items&lt;br&gt;&lt;br&gt;&lt;br&gt;Payments&lt;br&gt;&lt;br&gt;Ghi nhận thông tin thanh toán (mỗi Order chỉ có 1 Payment, theo yêu cầu của bạn).&lt;br&gt;&lt;br&gt;Quan hệ:&lt;br&gt;&lt;br&gt;Orders (1) ↔ (1) Payments&lt;br&gt;Payments.order_id là FK + unique.&lt;br&gt;&lt;br&gt;&lt;br&gt;Shipments&lt;br&gt;&lt;br&gt;Thông tin giao nhận (chỉ có nếu khách chọn “Giao tận nhà”).&lt;br&gt;&lt;br&gt;Quan hệ:&lt;br&gt;&lt;br&gt;Orders (1) ↔ (0..1) Shipments&lt;br&gt;&lt;br&gt;Trạng thái status cho biết tiến trình: Pending, Shipping, Delivered, Returned.&lt;/div&gt;" style="text;whiteSpace=wrap;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=middle;html=1;" vertex="1" parent="130">
+                    <mxGeometry x="530" width="460" height="950" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
