@@ -1,22 +1,10 @@
 <mxfile host="65bd71144e">
     <diagram name="LaundryDB_ERD" id="0">
-        <mxGraphModel dx="1812" dy="469" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="3135" dy="1408" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="6" value="&lt;b&gt;Orders&lt;/b&gt;&lt;br&gt;order_id (PK) user_id (FK) branch_id (FK) status total_price created_at completed_at" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#FF99CC;strokeColor=#6c8ebf;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" parent="1" vertex="1">
-                    <mxGeometry x="110" y="790" width="180" height="120" as="geometry"/>
-                </mxCell>
                 <mxCell id="102" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="2" target="6" edge="1">
-                    <mxGeometry as="geometry"/>
-                </mxCell>
-                <mxCell id="103" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="6" target="7" edge="1">
-                    <mxGeometry as="geometry"/>
-                </mxCell>
-                <mxCell id="105" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="6" target="8" edge="1">
-                    <mxGeometry as="geometry"/>
-                </mxCell>
-                <mxCell id="106" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="6" target="9" edge="1">
                     <mxGeometry as="geometry"/>
                 </mxCell>
                 <mxCell id="107" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="1" source="6" target="10" edge="1">
@@ -61,23 +49,38 @@
                 <mxCell id="128" value="" style="group;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" vertex="1" connectable="0" parent="1">
                     <mxGeometry x="-610" y="490" width="550" height="500" as="geometry"/>
                 </mxCell>
-                <mxCell id="112" value="" style="group;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" connectable="0" parent="128">
+                <mxCell id="112" value="" style="group;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" vertex="1" connectable="0" parent="128">
                     <mxGeometry x="370" width="180" height="500" as="geometry"/>
                 </mxCell>
-                <mxCell id="10" value="&lt;b&gt;Reviews&lt;/b&gt;&lt;br&gt;review_id (PK) order_id (FK) user_id (FK) rating comment created_at" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" parent="112" vertex="1">
+                <mxCell id="10" value="&lt;b&gt;Reviews&lt;/b&gt;&lt;br&gt;review_id (PK) order_id (FK) user_id (FK) rating comment created_at" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" parent="112" vertex="1">
                     <mxGeometry width="180" height="120" as="geometry"/>
                 </mxCell>
-                <mxCell id="11" value="&lt;b&gt;Branches&lt;/b&gt;&lt;br&gt;branch_id (PK) branch_name address phone" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" parent="112" vertex="1">
+                <mxCell id="11" value="&lt;b&gt;Branches&lt;/b&gt;&lt;br&gt;branch_id (PK) branch_name address phone" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" parent="112" vertex="1">
                     <mxGeometry y="200" width="180" height="120" as="geometry"/>
                 </mxCell>
-                <mxCell id="12" value="&lt;b&gt;Promotions&lt;/b&gt;&lt;br&gt;promo_id (PK) code description discount_percent start_date end_date" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" parent="112" vertex="1">
+                <mxCell id="12" value="&lt;b&gt;Promotions&lt;/b&gt;&lt;br&gt;promo_id (PK) code description discount_percent start_date end_date" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" parent="112" vertex="1">
                     <mxGeometry y="380" width="180" height="120" as="geometry"/>
                 </mxCell>
-                <mxCell id="124" value="Nhóm phụ trợ &amp; mở rộng&#xa;Reviews:&#xa;Đánh giá dịch vụ sau khi đơn hàng hoàn tất.&#xa;Quan hệ:&#xa;Orders (1) ↔ (0..1) Reviews&#xa;Users (1) ↔ (N) Reviews&#xa;&#xa;&#xa;Branches:&#xa;Chi nhánh tiệm giặt.&#xa;Quan hệ:&#xa;&#xa;Branches (1) ↔ (N) Orders&#xa;Branches (1) ↔ (N) Users (đối với nhân viên).&#xa;&#xa;&#xa;Promotions:&#xa;Mã giảm giá, khuyến mãi.&#xa;Quan hệ:&#xa;&#xa;Orders (N) ↔ (1) Promotions (đơn có thể áp 1 mã).&#xa;Có thể mở rộng thành N:N nếu muốn áp nhiều mã." style="text;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="128">
+                <mxCell id="124" value="Nhóm phụ trợ &amp; mở rộng&#xa;Reviews:&#xa;Đánh giá dịch vụ sau khi đơn hàng hoàn tất.&#xa;Quan hệ:&#xa;Orders (1) ↔ (0..1) Reviews&#xa;Users (1) ↔ (N) Reviews&#xa;&#xa;&#xa;Branches:&#xa;Chi nhánh tiệm giặt.&#xa;Quan hệ:&#xa;&#xa;Branches (1) ↔ (N) Orders&#xa;Branches (1) ↔ (N) Users (đối với nhân viên).&#xa;&#xa;&#xa;Promotions:&#xa;Mã giảm giá, khuyến mãi.&#xa;Quan hệ:&#xa;&#xa;Orders (N) ↔ (1) Promotions (đơn có thể áp 1 mã).&#xa;Có thể mở rộng thành N:N nếu muốn áp nhiều mã." style="text;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" vertex="1" parent="128">
                     <mxGeometry width="310" height="340" as="geometry"/>
                 </mxCell>
-                <mxCell id="130" value="" style="group;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" vertex="1" connectable="0" parent="1">
-                    <mxGeometry x="390" y="770" width="990" height="950" as="geometry"/>
+                <mxCell id="131" value="" style="group;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="110" y="770" width="1270" height="950" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="&lt;b&gt;Orders&lt;/b&gt;&lt;br&gt;order_id (PK) user_id (FK) branch_id (FK) status total_price created_at completed_at" style="shape=rectangle;rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#6666ff, #1d293b);strokeColor=#6c8ebf;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" parent="131" vertex="1">
+                    <mxGeometry width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="103" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="131" source="6" target="7" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="105" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="131" source="6" target="8" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="106" value="" style="endArrow=classic;html=1;strokeColor=#000000;rounded=0" parent="131" source="6" target="9" edge="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="130" value="" style="group;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" connectable="0" parent="131">
+                    <mxGeometry x="280" width="990" height="950" as="geometry"/>
                 </mxCell>
                 <mxCell id="113" value="" style="group" vertex="1" connectable="0" parent="130">
                     <mxGeometry width="460" height="330" as="geometry"/>
