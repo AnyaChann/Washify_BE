@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,12 +16,15 @@ import java.util.Set;
 
 /**
  * Entity đại diện cho mã giảm giá/khuyến mãi
+ * Hỗ trợ Soft Delete - không xóa vật lý khỏi database
  */
 @Entity
 @Table(name = "promotions")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE promotions SET deleted_at = NOW() WHERE id = ?") // Soft delete
+@Where(clause = "deleted_at IS NULL") // Chỉ query các record chưa bị xóa
 public class Promotion {
     
     @Id
@@ -45,6 +52,17 @@ public class Promotion {
     
     @Column(name = "is_active")
     private Boolean isActive = true; // Trạng thái hoạt động
+    
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+    
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @Column(name = "deleted_at") // Timestamp khi bị xóa (soft delete)
+    private LocalDateTime deletedAt;
     
     // Many-to-Many với Order (phía bị map)
     @ManyToMany(mappedBy = "promotions")

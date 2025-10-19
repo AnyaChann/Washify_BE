@@ -62,41 +62,41 @@ INSERT INTO roles (name, description) VALUES
 
 -- =============================================
 -- 2. BRANCHES (Chi nhánh)
--- Columns: id, name, address, phone, manager_name, created_at
+-- Columns: id, name, address, phone, manager_name, is_active, created_at, updated_at, deleted_at
 -- =============================================
-INSERT INTO branches (name, address, phone, manager_name, created_at) VALUES
-('Washify - Chi nhánh Quận 1', '123 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP.HCM', '0281234567', 'Nguyễn Văn Manager', NOW()),
-('Washify - Chi nhánh Quận 3', '456 Võ Văn Tần, Phường 5, Quận 3, TP.HCM', '0281234568', 'Trần Thị Lan', NOW()),
-('Washify - Chi nhánh Bình Thạnh', '789 Điện Biên Phủ, Phường 25, Bình Thạnh, TP.HCM', '0281234569', 'Lê Văn Hùng', NOW()),
-('Washify - Chi nhánh Phú Nhuận', '321 Phan Đăng Lưu, Phường 1, Phú Nhuận, TP.HCM', '0281234570', 'Phạm Thị Mai', NOW()),
-('Washify - Chi nhánh Tân Bình', '654 Hoàng Văn Thụ, Phường 4, Tân Bình, TP.HCM', '0281234571', 'Hoàng Văn Nam', NOW());
+INSERT INTO branches (name, address, phone, manager_name, is_active, created_at, updated_at) VALUES
+('Washify - Chi nhánh Quận 1', '123 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP.HCM', '0281234567', 'Nguyễn Văn Manager', true, NOW(), NOW()),
+('Washify - Chi nhánh Quận 3', '456 Võ Văn Tần, Phường 5, Quận 3, TP.HCM', '0281234568', 'Trần Thị Lan', true, NOW(), NOW()),
+('Washify - Chi nhánh Bình Thạnh', '789 Điện Biên Phủ, Phường 25, Bình Thạnh, TP.HCM', '0281234569', 'Lê Văn Hùng', true, NOW(), NOW()),
+('Washify - Chi nhánh Phú Nhuận', '321 Phan Đăng Lưu, Phường 1, Phú Nhuận, TP.HCM', '0281234570', 'Phạm Thị Mai', true, NOW(), NOW()),
+('Washify - Chi nhánh Tân Bình', '654 Hoàng Văn Thụ, Phường 4, Tân Bình, TP.HCM', '0281234571', 'Hoàng Văn Nam', false, NOW(), NOW());
 
 -- =============================================
 -- 3. USERS (Người dùng)
--- Columns: id, full_name, email, password, phone, address, created_at, updated_at, branch_id
+-- Columns: id, full_name, email, password, phone, address, is_active, created_at, updated_at, deleted_at, branch_id
 -- Password mặc định cho tất cả: "washify123"
 -- BCrypt hash: $2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8
 -- =============================================
 
 -- Admin (không thuộc branch nào)
-INSERT INTO users (full_name, email, password, phone, address, branch_id, created_at, updated_at) VALUES
-('Admin Washify', 'admin@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234567', '123 Admin Street, TP.HCM', NULL, NOW(), NOW());
+INSERT INTO users (full_name, email, password, phone, address, is_active, branch_id, created_at, updated_at) VALUES
+('Admin Washify', 'admin@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234567', '123 Admin Street, TP.HCM', true, NULL, NOW(), NOW());
 
 -- Managers (thuộc các chi nhánh)
-INSERT INTO users (full_name, email, password, phone, address, branch_id, created_at, updated_at) VALUES
-('Nguyễn Văn Manager', 'manager.quan1@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234568', '123 Nguyễn Huệ, Q1, TP.HCM', 1, NOW(), NOW()),
-('Trần Thị Lan', 'manager.quan3@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234569', '456 Võ Văn Tần, Q3, TP.HCM', 2, NOW(), NOW());
+INSERT INTO users (full_name, email, password, phone, address, is_active, branch_id, created_at, updated_at) VALUES
+('Nguyễn Văn Manager', 'manager.quan1@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234568', '123 Nguyễn Huệ, Q1, TP.HCM', true, 1, NOW(), NOW()),
+('Trần Thị Lan', 'manager.quan3@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234569', '456 Võ Văn Tần, Q3, TP.HCM', true, 2, NOW(), NOW());
 
 -- Staff (thuộc các chi nhánh)
-INSERT INTO users (full_name, email, password, phone, address, branch_id, created_at, updated_at) VALUES
-('Lê Văn Staff', 'staff1@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234570', '100 Staff Road, TP.HCM', 1, NOW(), NOW()),
-('Phạm Thị Hoa', 'staff2@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234571', '200 Staff Avenue, TP.HCM', 2, NOW(), NOW());
+INSERT INTO users (full_name, email, password, phone, address, is_active, branch_id, created_at, updated_at) VALUES
+('Lê Văn Staff', 'staff1@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234570', '100 Staff Road, TP.HCM', true, 1, NOW(), NOW()),
+('Phạm Thị Hoa', 'staff2@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234571', '200 Staff Avenue, TP.HCM', true, 2, NOW(), NOW());
 
 -- Customers (không thuộc branch)
-INSERT INTO users (full_name, email, password, phone, address, branch_id, created_at, updated_at) VALUES
-('Nguyễn Minh Khách', 'customer1@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0907777777', '789 Nguyễn Trãi, Q5, TP.HCM', NULL, NOW(), NOW()),
-('Trần Thị Hương', 'customer2@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0908888888', '321 Lê Lợi, Q1, TP.HCM', NULL, NOW(), NOW()),
-('Lê Quang Minh', 'customer3@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0909999999', '654 Cách Mạng Tháng 8, Q10, TP.HCM', NULL, NOW(), NOW());
+INSERT INTO users (full_name, email, password, phone, address, is_active, branch_id, created_at, updated_at) VALUES
+('Nguyễn Minh Khách', 'customer1@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0907777777', '789 Nguyễn Trãi, Q5, TP.HCM', true, NULL, NOW(), NOW()),
+('Trần Thị Hương', 'customer2@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0908888888', '321 Lê Lợi, Q1, TP.HCM', true, NULL, NOW(), NOW()),
+('Lê Quang Minh', 'customer3@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0909999999', '654 Cách Mạng Tháng 8, Q10, TP.HCM', true, NULL, NOW(), NOW());
 
 -- =============================================
 -- 4. USER_ROLES (Gán vai trò cho người dùng)
@@ -124,57 +124,57 @@ INSERT INTO user_roles (user_id, role_id) VALUES
 
 -- =============================================
 -- 5. SERVICES (Dịch vụ giặt ủi)
--- Columns: id, name, description, price, estimated_time, is_active
+-- Columns: id, name, description, price, estimated_time, is_active, created_at, updated_at, deleted_at
 -- =============================================
-INSERT INTO services (name, description, price, estimated_time, is_active) VALUES
+INSERT INTO services (name, description, price, estimated_time, is_active, created_at, updated_at) VALUES
 -- Giặt thường
-('Giặt thường - Quần áo', 'Giặt sạch quần áo thường ngày, giặt máy tiêu chuẩn', 20000.00, 24, true),
-('Giặt hấp - Quần áo cao cấp', 'Giặt hấp cho quần áo cao cấp, vải mỏng manh', 35000.00, 48, true),
+('Giặt thường - Quần áo', 'Giặt sạch quần áo thường ngày, giặt máy tiêu chuẩn', 20000.00, 24, true, NOW(), NOW()),
+('Giặt hấp - Quần áo cao cấp', 'Giặt hấp cho quần áo cao cấp, vải mỏng manh', 35000.00, 48, true, NOW(), NOW()),
 
 -- Giặt chăn màn
-('Giặt chăn đơn', 'Giặt chăn đơn, mền mỏng', 50000.00, 48, true),
-('Giặt chăn đôi/nệm', 'Giặt chăn đôi, nệm, chăn ga gối cao cấp', 80000.00, 72, true),
-('Giặt rèm cửa', 'Giặt rèm cửa, màn cửa các loại', 60000.00, 48, true),
+('Giặt chăn đơn', 'Giặt chăn đơn, mền mỏng', 50000.00, 48, true, NOW(), NOW()),
+('Giặt chăn đôi/nệm', 'Giặt chăn đôi, nệm, chăn ga gối cao cấp', 80000.00, 72, true, NOW(), NOW()),
+('Giặt rèm cửa', 'Giặt rèm cửa, màn cửa các loại', 60000.00, 48, true, NOW(), NOW()),
 
 -- Ủi là
-('Ủi áo sơ mi', 'Ủi phẳng áo sơ mi, áo công sở', 15000.00, 24, true),
-('Ủi quần tây/vest', 'Ủi quần tây, quần âu, áo vest', 20000.00, 24, true),
-('Ủi váy/đầm', 'Ủi váy, đầm các loại', 25000.00, 24, true),
+('Ủi áo sơ mi', 'Ủi phẳng áo sơ mi, áo công sở', 15000.00, 24, true, NOW(), NOW()),
+('Ủi quần tây/vest', 'Ủi quần tây, quần âu, áo vest', 20000.00, 24, true, NOW(), NOW()),
+('Ủi váy/đầm', 'Ủi váy, đầm các loại', 25000.00, 24, true, NOW(), NOW()),
 
 -- Giặt khô
-('Giặt khô áo vest/blazer', 'Giặt khô chuyên nghiệp cho áo vest, blazer', 70000.00, 72, true),
-('Giặt khô áo khoác dạ', 'Giặt khô áo khoác dạ, áo khoác cao cấp', 90000.00, 72, true),
+('Giặt khô áo vest/blazer', 'Giặt khô chuyên nghiệp cho áo vest, blazer', 70000.00, 72, true, NOW(), NOW()),
+('Giặt khô áo khoác dạ', 'Giặt khô áo khoác dạ, áo khoác cao cấp', 90000.00, 72, true, NOW(), NOW()),
 
 -- Dịch vụ đặc biệt
-('Giặt giày thể thao', 'Giặt sạch giày thể thao, sneaker', 50000.00, 48, true),
-('Giặt gấu bông', 'Giặt gấu bông, thú nhồi bông các size', 40000.00, 48, true),
-('Giặt hấp rèm, sofa', 'Giặt hấp rèm cửa lớn, sofa vải', 150000.00, 96, false);
+('Giặt giày thể thao', 'Giặt sạch giày thể thao, sneaker', 50000.00, 48, true, NOW(), NOW()),
+('Giặt gấu bông', 'Giặt gấu bông, thú nhồi bông các size', 40000.00, 48, true, NOW(), NOW()),
+('Giặt hấp rèm, sofa', 'Giặt hấp rèm cửa lớn, sofa vải', 150000.00, 96, false, NOW(), NOW());
 
 -- =============================================
 -- 6. PROMOTIONS (Khuyến mãi)
--- Columns: id, code, description, discount_type, discount_value, start_date, end_date, is_active
+-- Columns: id, code, description, discount_type, discount_value, start_date, end_date, is_active, created_at, updated_at, deleted_at
 -- =============================================
-INSERT INTO promotions (code, description, discount_type, discount_value, start_date, end_date, is_active) VALUES
+INSERT INTO promotions (code, description, discount_type, discount_value, start_date, end_date, is_active, created_at, updated_at) VALUES
 -- Giảm giá phần trăm
-('WELCOME50', 'Giảm 50% cho khách hàng mới - Đơn hàng đầu tiên', 'PERCENT', 50.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', true),
-('SUMMER20', 'Giảm 20% mùa hè - Áp dụng tất cả dịch vụ', 'PERCENT', 20.00, '2025-06-01 00:00:00', '2025-08-31 23:59:59', true),
-('VIP30', 'Giảm 30% cho khách hàng VIP', 'PERCENT', 30.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', true),
+('WELCOME50', 'Giảm 50% cho khách hàng mới - Đơn hàng đầu tiên', 'PERCENT', 50.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', true, NOW(), NOW()),
+('SUMMER20', 'Giảm 20% mùa hè - Áp dụng tất cả dịch vụ', 'PERCENT', 20.00, '2025-06-01 00:00:00', '2025-08-31 23:59:59', true, NOW(), NOW()),
+('VIP30', 'Giảm 30% cho khách hàng VIP', 'PERCENT', 30.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', true, NOW(), NOW()),
 
 -- Giảm giá cố định
-('SAVE50K', 'Giảm 50.000đ cho đơn từ 300.000đ', 'FIXED', 50000.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', true),
-('SAVE100K', 'Giảm 100.000đ cho đơn từ 1.000.000đ', 'FIXED', 100000.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', true),
+('SAVE50K', 'Giảm 50.000đ cho đơn từ 300.000đ', 'FIXED', 50000.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', true, NOW(), NOW()),
+('SAVE100K', 'Giảm 100.000đ cho đơn từ 1.000.000đ', 'FIXED', 100000.00, '2025-01-01 00:00:00', '2025-12-31 23:59:59', true, NOW(), NOW()),
 
 -- Khuyến mãi ngày lễ
-('TET2025', 'Khuyến mãi Tết 2025 - Giảm 25%', 'PERCENT', 25.00, '2025-01-20 00:00:00', '2025-02-10 23:59:59', true),
-('WOMEN8', 'Giảm 20% Ngày Quốc tế Phụ nữ 8/3', 'PERCENT', 20.00, '2025-03-07 00:00:00', '2025-03-09 23:59:59', false);
+('TET2025', 'Khuyến mãi Tết 2025 - Giảm 25%', 'PERCENT', 25.00, '2025-01-20 00:00:00', '2025-02-10 23:59:59', true, NOW(), NOW()),
+('WOMEN8', 'Giảm 20% Ngày Quốc tế Phụ nữ 8/3', 'PERCENT', 20.00, '2025-03-07 00:00:00', '2025-03-09 23:59:59', false, NOW(), NOW());
 
 -- =============================================
 -- 7. SHIPPERS (Thông tin shipper)
--- Columns: id, name, phone, vehicle_number, is_active
+-- Columns: id, name, phone, vehicle_number, is_active, created_at, updated_at, deleted_at
 -- =============================================
-INSERT INTO shippers (name, phone, vehicle_number, is_active) VALUES
-('Hoàng Văn Shipper', '0901234572', '59-A1 12345', true),
-('Vũ Thị Mai', '0901234573', '59-B2 67890', true);
+INSERT INTO shippers (name, phone, vehicle_number, is_active, created_at, updated_at) VALUES
+('Hoàng Văn Shipper', '0901234572', '59-A1 12345', true, NOW(), NOW()),
+('Vũ Thị Mai', '0901234573', '59-B2 67890', true, NOW(), NOW());
 
 -- =============================================
 -- 8. SAMPLE ORDERS (Đơn hàng mẫu)

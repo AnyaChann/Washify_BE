@@ -4,19 +4,27 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Entity đại diện cho các dịch vụ giặt là
+ * Hỗ trợ Soft Delete - không xóa vật lý khỏi database
  */
 @Entity
 @Table(name = "services")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE services SET deleted_at = NOW() WHERE id = ?") // Soft delete
+@Where(clause = "deleted_at IS NULL") // Chỉ query các record chưa bị xóa
 public class Service {
     
     @Id
@@ -37,6 +45,17 @@ public class Service {
     
     @Column(name = "is_active")
     private Boolean isActive = true; // Trạng thái hoạt động của dịch vụ
+    
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+    
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @Column(name = "deleted_at") // Timestamp khi bị xóa (soft delete)
+    private LocalDateTime deletedAt;
     
     // One-to-Many: Một service có nhiều order items
     @OneToMany(mappedBy = "service")

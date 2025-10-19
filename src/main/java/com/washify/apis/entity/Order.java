@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,12 +15,15 @@ import java.util.Set;
 
 /**
  * Entity đại diện cho đơn hàng của khách hàng
+ * Hỗ trợ Soft Delete - không xóa vật lý khỏi database
  */
 @Entity
 @Table(name = "orders")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE orders SET deleted_at = NOW() WHERE id = ?") // Soft delete
+@Where(clause = "deleted_at IS NULL") // Chỉ query các record chưa bị xóa
 public class Order {
     
     @Id
@@ -48,6 +53,9 @@ public class Order {
     
     @Column(columnDefinition = "TEXT")
     private String notes; // Ghi chú thêm
+    
+    @Column(name = "deleted_at") // Timestamp khi bị xóa (soft delete)
+    private LocalDateTime deletedAt;
     
     // One-to-Many: Một order có nhiều order items
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)

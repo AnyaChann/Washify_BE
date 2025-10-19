@@ -3,16 +3,20 @@ package com.washify.apis.repository;
 import com.washify.apis.entity.Order;
 import com.washify.apis.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository interface cho Order entity
  * Cung cấp các phương thức truy vấn database cho bảng orders
+ * Hỗ trợ Soft Delete
  */
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -75,4 +79,24 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @return Số lượng orders
      */
     long countByStatus(Order.OrderStatus status);
+    
+    // ========================================
+    // SOFT DELETE METHODS
+    // ========================================
+    
+    @Query(value = "SELECT * FROM orders WHERE deleted_at IS NOT NULL", nativeQuery = true)
+    List<Order> findAllDeleted();
+    
+    @Query(value = "SELECT * FROM orders WHERE id = :id AND deleted_at IS NOT NULL", nativeQuery = true)
+    Optional<Order> findDeletedById(@Param("id") Long id);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE orders SET deleted_at = NULL WHERE id = :id", nativeQuery = true)
+    int restoreById(@Param("id") Long id);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM orders WHERE id = :id", nativeQuery = true)
+    int permanentlyDeleteById(@Param("id") Long id);
 }

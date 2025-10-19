@@ -2,9 +2,11 @@ package com.washify.apis.repository;
 
 import com.washify.apis.entity.Promotion;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.Optional;
 /**
  * Repository interface cho Promotion entity
  * Cung cấp các phương thức truy vấn database cho bảng promotions
+ * Hỗ trợ Soft Delete
  */
 @Repository
 public interface PromotionRepository extends JpaRepository<Promotion, Long> {
@@ -61,4 +64,24 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
      */
     @Query("SELECT p FROM Promotion p WHERE p.isActive = true AND p.endDate BETWEEN :now AND :expiryDate")
     List<Promotion> findExpiringPromotions(@Param("now") LocalDateTime now, @Param("expiryDate") LocalDateTime expiryDate);
+    
+    // ========================================
+    // SOFT DELETE METHODS
+    // ========================================
+    
+    @Query(value = "SELECT * FROM promotions WHERE deleted_at IS NOT NULL", nativeQuery = true)
+    List<Promotion> findAllDeleted();
+    
+    @Query(value = "SELECT * FROM promotions WHERE id = :id AND deleted_at IS NOT NULL", nativeQuery = true)
+    Optional<Promotion> findDeletedById(@Param("id") Long id);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE promotions SET deleted_at = NULL WHERE id = :id", nativeQuery = true)
+    int restoreById(@Param("id") Long id);
+    
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM promotions WHERE id = :id", nativeQuery = true)
+    int permanentlyDeleteById(@Param("id") Long id);
 }

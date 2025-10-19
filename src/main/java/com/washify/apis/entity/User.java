@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -13,12 +15,15 @@ import java.util.Set;
 
 /**
  * Entity đại diện cho người dùng trong hệ thống (khách hàng, nhân viên, admin)
+ * Hỗ trợ Soft Delete - không xóa vật lý khỏi database
  */
 @Entity // Đánh dấu đây là JPA entity
 @Table(name = "users") // Map với bảng "users"
 @Data // Lombok: tự động tạo getters, setters, toString, equals, hashCode
 @NoArgsConstructor // Constructor không tham số
 @AllArgsConstructor // Constructor đầy đủ tham số
+@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE id = ?") // Soft delete
+@Where(clause = "deleted_at IS NULL") // Chỉ query các record chưa bị xóa
 public class User {
     
     @Id // Khóa chính
@@ -40,6 +45,9 @@ public class User {
     @Column(length = 255)
     private String address; // Địa chỉ
     
+    @Column(name = "is_active")
+    private Boolean isActive = true; // Trạng thái hoạt động
+    
     @CreationTimestamp // Tự động set thời gian tạo
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -47,6 +55,9 @@ public class User {
     @UpdateTimestamp // Tự động update mỗi khi record thay đổi
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    @Column(name = "deleted_at") // Timestamp khi bị xóa (soft delete)
+    private LocalDateTime deletedAt;
     
     // Many-to-One: Nhiều users thuộc một branch
     @ManyToOne(fetch = FetchType.LAZY)
