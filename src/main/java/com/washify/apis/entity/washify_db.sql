@@ -1,3 +1,4 @@
+CREATE DATABASE IF NOT EXISTS washify_db;
 -- =========================
 -- 1. USERS & ROLES
 -- =========================
