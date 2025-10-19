@@ -1,20 +1,17 @@
 package com.washify.apis.service;
 
-import com.washify.apis.dto.request.UserRegistrationRequest;
 import com.washify.apis.dto.request.UserUpdateRequest;
 import com.washify.apis.dto.response.UserResponse;
 import com.washify.apis.entity.Role;
 import com.washify.apis.entity.User;
+import com.washify.apis.exception.ResourceNotFoundException;
 import com.washify.apis.repository.RoleRepository;
 import com.washify.apis.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -27,33 +24,6 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-    
-    /**
-     * Đăng ký user mới
-     */
-    public UserResponse registerUser(UserRegistrationRequest request) {
-        // Kiểm tra email đã tồn tại chưa
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email đã được sử dụng");
-        }
-        
-        // Tạo user mới
-        User user = new User();
-        user.setFullName(request.getFullName());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setPhone(request.getPhone());
-        user.setAddress(request.getAddress());
-        
-        // Gán role mặc định là CUSTOMER
-        Role customerRole = roleRepository.findByName("CUSTOMER")
-                .orElseThrow(() -> new RuntimeException("Role CUSTOMER không tồn tại"));
-        user.setRoles(Set.of(customerRole));
-        
-        User savedUser = userRepository.save(user);
-        return mapToUserResponse(savedUser);
-    }
     
     /**
      * Lấy thông tin user theo ID
@@ -61,7 +31,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponse getUserById(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         return mapToUserResponse(user);
     }
     
@@ -71,7 +41,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponse getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với email: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
         return mapToUserResponse(user);
     }
     
@@ -90,7 +60,7 @@ public class UserService {
      */
     public UserResponse updateUser(Long userId, UserUpdateRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         
         if (request.getFullName() != null) {
             user.setFullName(request.getFullName());
@@ -111,11 +81,11 @@ public class UserService {
     }
     
     /**
-     * Xóa user
+     * Xóa user (soft delete)
      */
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("Không tìm thấy user với ID: " + userId);
+            throw new ResourceNotFoundException("User", "id", userId);
         }
         userRepository.deleteById(userId);
     }
@@ -125,10 +95,10 @@ public class UserService {
      */
     public UserResponse assignRole(Long userId, String roleName) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         
         Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy role: " + roleName));
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName));
         
         user.getRoles().add(role);
         User updatedUser = userRepository.save(user);

@@ -26,17 +26,6 @@ public class UserController {
     private final UserService userService;
     
     /**
-     * Đăng ký user mới
-     * POST /api/users/register
-     */
-    @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserResponse>> registerUser(@Valid @RequestBody UserRegistrationRequest request) {
-        UserResponse user = userService.registerUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(user, "Đăng ký thành công"));
-    }
-    
-    /**
      * Lấy thông tin user theo ID
      * GET /api/users/{id}
      * Admin/Staff xem tất cả, User chỉ xem chính mình
