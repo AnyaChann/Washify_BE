@@ -14,19 +14,19 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     
     /**
-     * Tìm tất cả notifications của một user
+     * Tìm tất cả notifications của một user với phân trang
      * @param userId ID của user
-     * @return Danh sách notifications
+     * @param pageable Thông tin phân trang
+     * @return Page chứa notifications
      */
-    List<Notification> findByUserId(Long userId);
+    org.springframework.data.domain.Page<Notification> findByUserId(Long userId, org.springframework.data.domain.Pageable pageable);
     
     /**
      * Tìm notifications chưa đọc của user
      * @param userId ID của user
-     * @param isRead Trạng thái đã đọc
      * @return Danh sách notifications chưa đọc
      */
-    List<Notification> findByUserIdAndIsRead(Long userId, Boolean isRead);
+    List<Notification> findByUserIdAndIsReadFalse(Long userId);
     
     /**
      * Tìm notifications của user, sắp xếp theo thời gian mới nhất
@@ -38,10 +38,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     /**
      * Đếm số notifications chưa đọc của user
      * @param userId ID của user
-     * @param isRead Trạng thái đã đọc
      * @return Số lượng notifications chưa đọc
      */
-    long countByUserIdAndIsRead(Long userId, Boolean isRead);
+    Long countByUserIdAndIsReadFalse(Long userId);
     
     /**
      * Xóa tất cả notifications của một user

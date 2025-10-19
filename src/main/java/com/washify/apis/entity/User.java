@@ -33,8 +33,11 @@ public class User {
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName; // Họ tên đầy đủ
     
+    @Column(nullable = false, unique = true, length = 50)
+    private String username; // Username (unique, dùng để đăng nhập)
+    
     @Column(nullable = false, unique = true, length = 100)
-    private String email; // Email (unique, dùng để đăng nhập)
+    private String email; // Email (unique)
     
     @Column(nullable = false)
     private String password; // Mật khẩu đã mã hóa

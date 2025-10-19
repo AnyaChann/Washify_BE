@@ -18,8 +18,12 @@ public class NotificationResponse {
     
     private Long id;
     private Long userId;
+    private String username;
     private String title;
     private String message;
+    private String type;
+    private Long relatedId;
     private Boolean isRead;
+    private LocalDateTime readAt;
     private LocalDateTime createdAt;
 }

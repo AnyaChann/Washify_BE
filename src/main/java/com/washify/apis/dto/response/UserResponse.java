@@ -18,12 +18,15 @@ import java.util.Set;
 public class UserResponse {
     
     private Long id;
+    private String username;
     private String fullName;
     private String email;
     private String phone;
     private String address;
+    private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
     private Long branchId;
     private String branchName;
     private Set<String> roles; // Danh sách tên roles

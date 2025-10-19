@@ -18,11 +18,11 @@ public class AuthResponse {
     
     private String token; // JWT token
     
-    @Builder.Default
-    private String type = "Bearer"; // Token type
+    private String tokenType; // Token type (Bearer)
     
     private Long userId;
+    private String username;
     private String email;
     private String fullName;
-    private Set<String> roles;
+    private java.util.List<String> roles;
 }

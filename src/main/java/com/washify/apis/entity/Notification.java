@@ -33,8 +33,17 @@ public class Notification {
     @Column(columnDefinition = "TEXT")
     private String message; // Nội dung thông báo
     
+    @Column(length = 50)
+    private String type; // Loại thông báo (có thể dùng String thay vì enum để đơn giản)
+    
+    @Column(name = "related_id")
+    private Long relatedId; // ID liên quan (order, payment, etc.)
+    
     @Column(name = "is_read")
     private Boolean isRead = false; // Trạng thái đã đọc/chưa đọc
+    
+    @Column(name = "read_at")
+    private LocalDateTime readAt; // Thời gian đọc thông báo
     
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
