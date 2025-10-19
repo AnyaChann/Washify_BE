@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entity đại diện cho các dịch vụ giặt là
+ */
 @Entity
 @Table(name = "services")
 @Data
@@ -21,20 +24,21 @@ public class Service {
     private Long id;
     
     @Column(nullable = false, length = 100)
-    private String name;
+    private String name; // Tên dịch vụ (VD: Giặt khô, Giặt ướt, Là hơi)
     
     @Column(columnDefinition = "TEXT")
-    private String description;
+    private String description; // Mô tả chi tiết dịch vụ
     
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    private BigDecimal price; // Giá dịch vụ (có thể theo kg hoặc item)
     
     @Column(name = "estimated_time")
-    private Integer estimatedTime; // in hours
+    private Integer estimatedTime; // Thời gian ước tính (đơn vị: giờ)
     
     @Column(name = "is_active")
-    private Boolean isActive = true;
+    private Boolean isActive = true; // Trạng thái hoạt động của dịch vụ
     
+    // One-to-Many: Một service có nhiều order items
     @OneToMany(mappedBy = "service")
     private Set<OrderItem> orderItems = new HashSet<>();
 }

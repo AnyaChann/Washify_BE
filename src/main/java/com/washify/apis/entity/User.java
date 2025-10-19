@@ -11,58 +11,66 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Table(name = "users")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+/**
+ * Entity đại diện cho người dùng trong hệ thống (khách hàng, nhân viên, admin)
+ */
+@Entity // Đánh dấu đây là JPA entity
+@Table(name = "users") // Map với bảng "users"
+@Data // Lombok: tự động tạo getters, setters, toString, equals, hashCode
+@NoArgsConstructor // Constructor không tham số
+@AllArgsConstructor // Constructor đầy đủ tham số
 public class User {
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id // Khóa chính
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto increment
     private Long id;
     
     @Column(name = "full_name", nullable = false, length = 100)
-    private String fullName;
+    private String fullName; // Họ tên đầy đủ
     
     @Column(nullable = false, unique = true, length = 100)
-    private String email;
+    private String email; // Email (unique, dùng để đăng nhập)
     
     @Column(nullable = false)
-    private String password;
+    private String password; // Mật khẩu đã mã hóa
     
     @Column(length = 20)
-    private String phone;
+    private String phone; // Số điện thoại
     
     @Column(length = 255)
-    private String address;
+    private String address; // Địa chỉ
     
-    @CreationTimestamp
+    @CreationTimestamp // Tự động set thời gian tạo
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     
-    @UpdateTimestamp
+    @UpdateTimestamp // Tự động update mỗi khi record thay đổi
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
+    // Many-to-One: Nhiều users thuộc một branch
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id")
-    private Branch branch;
+    private Branch branch; // Chi nhánh làm việc (nullable)
     
-    @ManyToMany(fetch = FetchType.EAGER)
+    // Many-to-Many: User có nhiều roles, Role có nhiều users
+    @ManyToMany(fetch = FetchType.EAGER) // EAGER: load roles ngay khi load user
     @JoinTable(
-        name = "user_roles",
+        name = "user_roles", // Bảng trung gian
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
     
+    // One-to-Many: Một user có nhiều orders
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Order> orders = new HashSet<>();
     
+    // One-to-Many: Một user có nhiều reviews
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Review> reviews = new HashSet<>();
     
+    // One-to-Many: Một user có nhiều notifications
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Notification> notifications = new HashSet<>();
 }

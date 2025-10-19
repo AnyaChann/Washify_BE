@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entity đại diện cho đơn hàng của khách hàng
+ */
 @Entity
 @Table(name = "orders")
 @Data
@@ -22,40 +25,47 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    // Many-to-One: Nhiều orders thuộc một user
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private User user; // Khách hàng đặt đơn
     
+    // Many-to-One: Nhiều orders thuộc một branch
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id")
-    private Branch branch;
+    private Branch branch; // Chi nhánh xử lý đơn hàng
     
     @CreationTimestamp
     @Column(name = "order_date")
-    private LocalDateTime orderDate;
+    private LocalDateTime orderDate; // Thời gian đặt đơn
     
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // Lưu dạng text trong DB
     @Column(nullable = false)
-    private OrderStatus status = OrderStatus.PENDING;
+    private OrderStatus status = OrderStatus.PENDING; // Trạng thái đơn hàng
     
     @Column(name = "total_amount", precision = 10, scale = 2)
-    private BigDecimal totalAmount = BigDecimal.ZERO;
+    private BigDecimal totalAmount = BigDecimal.ZERO; // Tổng tiền đơn hàng
     
     @Column(columnDefinition = "TEXT")
-    private String notes;
+    private String notes; // Ghi chú thêm
     
+    // One-to-Many: Một order có nhiều order items
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderItem> orderItems = new HashSet<>();
     
+    // One-to-One: Một order có một payment
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Payment payment;
     
+    // One-to-One: Một order có tối đa một shipment
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Shipment shipment;
     
+    // One-to-Many: Một order có nhiều reviews
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private Set<Review> reviews = new HashSet<>();
     
+    // Many-to-Many: Order có nhiều promotions, Promotion áp dụng cho nhiều orders
     @ManyToMany
     @JoinTable(
         name = "order_promotions",
@@ -64,10 +74,17 @@ public class Order {
     )
     private Set<Promotion> promotions = new HashSet<>();
     
+    // One-to-Many: Một order có nhiều attachments
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private Set<Attachment> attachments = new HashSet<>();
     
+    /**
+     * Enum định nghĩa các trạng thái của đơn hàng
+     */
     public enum OrderStatus {
-        PENDING, IN_PROGRESS, COMPLETED, CANCELLED
+        PENDING,      // Chờ xử lý
+        IN_PROGRESS,  // Đang xử lý
+        COMPLETED,    // Hoàn thành
+        CANCELLED     // Đã hủy
     }
 }

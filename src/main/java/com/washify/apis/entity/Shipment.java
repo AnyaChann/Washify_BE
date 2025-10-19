@@ -6,7 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
+/**
+ * Entity đại diện cho thông tin giao hàng tận nơi
+ */
 @Entity
 @Table(name = "shipments")
 @Data
@@ -18,38 +23,48 @@ public class Shipment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @OneToOne(fetch = FetchType.LAZY)
+    // One-to-One: Mỗi order có tối đa một shipment
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", unique = true)
-    private Order order;
+    private Order order; // Đơn hàng được giao
     
+    // Many-to-One: Nhiều shipments thuộc một user (người nhận)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private User user; // Người nhận hàng
     
+    // Many-to-One: Nhiều shipments được giao bởi một shipper
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shipper_id")
-    private Shipper shipper;
+    @JoinColumn(name = "shipper_id", nullable = true)
+    private Shipper shipper; // Người giao hàng (nullable)
     
     @Column(nullable = false, length = 255)
-    private String address;
+    private String address; // Địa chỉ giao hàng
     
     @Enumerated(EnumType.STRING)
     @Column(name = "delivery_status")
-    private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING;
+    private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING; // Trạng thái giao hàng
     
     @Column(name = "delivery_date")
-    private LocalDateTime deliveryDate;
+    private LocalDateTime deliveryDate; // Thời gian giao hàng (dự kiến hoặc thực tế)
     
     @Column(name = "shipper_name", length = 100)
-    private String shipperName;
+    private String shipperName; // Tên shipper (backup nếu không có trong bảng shippers)
     
     @Column(name = "shipper_phone", length = 20)
-    private String shipperPhone;
+    private String shipperPhone; // SĐT shipper (backup)
     
+    // One-to-Many: Một shipment có nhiều attachments
     @OneToMany(mappedBy = "shipment", cascade = CascadeType.ALL)
-    private Set<Attachment> attachments = new java.util.HashSet<>();
+    private Set<Attachment> attachments = new HashSet<>();
     
+    /**
+     * Enum định nghĩa trạng thái giao hàng
+     */
     public enum DeliveryStatus {
-        PENDING, SHIPPING, DELIVERED, CANCELLED
+        PENDING,   // Chờ giao
+        SHIPPING,  // Đang giao
+        DELIVERED, // Đã giao
+        CANCELLED  // Đã hủy
     }
 }

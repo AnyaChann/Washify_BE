@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entity đại diện cho chi nhánh cửa tiệm giặt là
+ */
 @Entity
 @Table(name = "branches")
 @Data
@@ -22,24 +25,26 @@ public class Branch {
     private Long id;
     
     @Column(nullable = false, length = 100)
-    private String name;
+    private String name; // Tên chi nhánh
     
     @Column(nullable = false, length = 255)
-    private String address;
+    private String address; // Địa chỉ chi nhánh
     
     @Column(length = 20)
-    private String phone;
+    private String phone; // Số điện thoại chi nhánh
     
     @Column(name = "manager_name", length = 100)
-    private String managerName;
+    private String managerName; // Tên quản lý chi nhánh
     
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt; // Thời gian tạo chi nhánh
     
+    // One-to-Many: Một branch có nhiều users
     @OneToMany(mappedBy = "branch")
     private Set<User> users = new HashSet<>();
     
+    // One-to-Many: Một branch có nhiều orders
     @OneToMany(mappedBy = "branch")
     private Set<Order> orders = new HashSet<>();
 }
