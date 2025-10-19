@@ -1,0 +1,118 @@
+package com.washify.apis.service;
+
+import com.washify.apis.dto.request.ServiceRequest;
+import com.washify.apis.dto.response.ServiceResponse;
+import com.washify.apis.repository.ServiceRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Service xử lý business logic cho Service (dịch vụ giặt là)
+ */
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class ServiceService {
+    
+    private final ServiceRepository serviceRepository;
+    
+    /**
+     * Tạo dịch vụ mới
+     */
+    public ServiceResponse createService(ServiceRequest request) {
+        com.washify.apis.entity.Service service = new com.washify.apis.entity.Service();
+        service.setName(request.getName());
+        service.setDescription(request.getDescription());
+        service.setPrice(request.getPrice());
+        service.setEstimatedTime(request.getEstimatedTime());
+        service.setIsActive(request.getIsActive());
+        
+        com.washify.apis.entity.Service savedService = serviceRepository.save(service);
+        return mapToServiceResponse(savedService);
+    }
+    
+    /**
+     * Lấy thông tin dịch vụ theo ID
+     */
+    @Transactional(readOnly = true)
+    public ServiceResponse getServiceById(Long serviceId) {
+        com.washify.apis.entity.Service service = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + serviceId));
+        return mapToServiceResponse(service);
+    }
+    
+    /**
+     * Lấy tất cả dịch vụ
+     */
+    @Transactional(readOnly = true)
+    public List<ServiceResponse> getAllServices() {
+        return serviceRepository.findAll().stream()
+                .map(this::mapToServiceResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Lấy các dịch vụ đang hoạt động
+     */
+    @Transactional(readOnly = true)
+    public List<ServiceResponse> getActiveServices() {
+        return serviceRepository.findByIsActive(true).stream()
+                .map(this::mapToServiceResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Cập nhật dịch vụ
+     */
+    public ServiceResponse updateService(Long serviceId, ServiceRequest request) {
+        com.washify.apis.entity.Service service = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + serviceId));
+        
+        service.setName(request.getName());
+        service.setDescription(request.getDescription());
+        service.setPrice(request.getPrice());
+        service.setEstimatedTime(request.getEstimatedTime());
+        service.setIsActive(request.getIsActive());
+        
+        com.washify.apis.entity.Service updatedService = serviceRepository.save(service);
+        return mapToServiceResponse(updatedService);
+    }
+    
+    /**
+     * Xóa dịch vụ
+     */
+    public void deleteService(Long serviceId) {
+        if (!serviceRepository.existsById(serviceId)) {
+            throw new RuntimeException("Không tìm thấy dịch vụ với ID: " + serviceId);
+        }
+        serviceRepository.deleteById(serviceId);
+    }
+    
+    /**
+     * Tìm kiếm dịch vụ theo tên
+     */
+    @Transactional(readOnly = true)
+    public List<ServiceResponse> searchServicesByName(String name) {
+        return serviceRepository.findByNameContainingIgnoreCase(name).stream()
+                .map(this::mapToServiceResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Map Entity sang DTO Response
+     */
+    private ServiceResponse mapToServiceResponse(com.washify.apis.entity.Service service) {
+        return ServiceResponse.builder()
+                .id(service.getId())
+                .name(service.getName())
+                .description(service.getDescription())
+                .price(service.getPrice())
+                .estimatedTime(service.getEstimatedTime())
+                .isActive(service.getIsActive())
+                .build();
+    }
+}
