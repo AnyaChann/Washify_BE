@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,8 +27,10 @@ public class ReviewController {
     /**
      * Tạo đánh giá mới
      * POST /api/reviews
+     * Chỉ Customer sau khi hoàn thành dịch vụ
      */
     @PostMapping
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<ApiResponse<ReviewResponse>> createReview(
             @RequestParam Long userId,
             @Valid @RequestBody ReviewRequest request) {
@@ -99,8 +102,10 @@ public class ReviewController {
     /**
      * Xóa đánh giá
      * DELETE /api/reviews/{id}
+     * Admin hoặc chính user tạo review
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteReview(@PathVariable Long id) {
         reviewService.deleteReview(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa đánh giá thành công"));

@@ -1,5 +1,7 @@
 package com.washify.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,11 +26,13 @@ public class Shipment {
     private Long id;
     
     // One-to-One: Mỗi order có tối đa một shipment
+    @JsonIgnoreProperties({"payment", "shipment", "orderItems", "reviews", "promotions", "attachments"}) // Chỉ serialize thông tin cơ bản của Order
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", unique = true)
     private Order order; // Đơn hàng được giao
     
     // Many-to-One: Nhiều shipments thuộc một user (người nhận)
+    @JsonIgnoreProperties({"orders", "reviews", "notifications", "roles"}) // Tránh circular reference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // Người nhận hàng
@@ -55,6 +59,7 @@ public class Shipment {
     private String shipperPhone; // SĐT shipper (backup)
     
     // One-to-Many: Một shipment có nhiều attachments
+    @JsonIgnore // Tránh circular reference
     @OneToMany(mappedBy = "shipment", cascade = CascadeType.ALL)
     private Set<Attachment> attachments = new HashSet<>();
     

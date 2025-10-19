@@ -1,5 +1,6 @@
 package com.washify.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -58,22 +59,27 @@ public class Order {
     private LocalDateTime deletedAt;
     
     // One-to-Many: Một order có nhiều order items
+    @JsonIgnore // Tránh circular reference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderItem> orderItems = new HashSet<>();
     
     // One-to-One: Một order có một payment
+    @JsonIgnore // Tránh circular reference Order ↔ Payment
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Payment payment;
     
     // One-to-One: Một order có tối đa một shipment
+    @JsonIgnore // Tránh circular reference Order ↔ Shipment
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private Shipment shipment;
     
     // One-to-Many: Một order có nhiều reviews
+    @JsonIgnore // Tránh circular reference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private Set<Review> reviews = new HashSet<>();
     
     // Many-to-Many: Order có nhiều promotions, Promotion áp dụng cho nhiều orders
+    @JsonIgnore // Tránh circular reference
     @ManyToMany
     @JoinTable(
         name = "order_promotions",
@@ -83,6 +89,7 @@ public class Order {
     private Set<Promotion> promotions = new HashSet<>();
     
     // One-to-Many: Một order có nhiều attachments
+    @JsonIgnore // Tránh circular reference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private Set<Attachment> attachments = new HashSet<>();
     

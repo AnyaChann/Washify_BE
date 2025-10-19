@@ -1,5 +1,6 @@
 package com.washify.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -77,14 +78,17 @@ public class User {
     private Set<Role> roles = new HashSet<>();
     
     // One-to-Many: Một user có nhiều orders
+    @JsonIgnore // Tránh circular reference khi serialize JSON
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Order> orders = new HashSet<>();
     
     // One-to-Many: Một user có nhiều reviews
+    @JsonIgnore // Tránh circular reference khi serialize JSON
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Review> reviews = new HashSet<>();
     
     // One-to-Many: Một user có nhiều notifications
+    @JsonIgnore // Tránh circular reference khi serialize JSON
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Notification> notifications = new HashSet<>();
 }

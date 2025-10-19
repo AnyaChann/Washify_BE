@@ -5,6 +5,7 @@ package com.washify.apis.enums;
  */
 public enum RoleType {
     ADMIN("Quản trị viên"),
+    MANAGER("Quản lý chi nhánh"),
     STAFF("Nhân viên"),
     CUSTOMER("Khách hàng"),
     SHIPPER("Người giao hàng");

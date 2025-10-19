@@ -1,5 +1,6 @@
 package com.washify.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class Payment {
     private Long id;
     
     // One-to-One: Mỗi order chỉ có một payment
+    @JsonIgnoreProperties({"payment", "shipment", "orderItems", "reviews", "promotions", "attachments"}) // Chỉ serialize thông tin cơ bản của Order
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", unique = true, nullable = false)
     private Order order; // Đơn hàng được thanh toán

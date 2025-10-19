@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,8 +27,10 @@ public class BranchController {
     /**
      * Tạo chi nhánh mới
      * POST /api/branches
+     * Chỉ Admin
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<BranchResponse>> createBranch(@Valid @RequestBody BranchRequest request) {
         BranchResponse branch = branchService.createBranch(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -57,8 +60,10 @@ public class BranchController {
     /**
      * Cập nhật chi nhánh
      * PUT /api/branches/{id}
+     * Chỉ Admin
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<BranchResponse>> updateBranch(
             @PathVariable Long id,
             @Valid @RequestBody BranchRequest request) {
@@ -69,8 +74,10 @@ public class BranchController {
     /**
      * Xóa chi nhánh
      * DELETE /api/branches/{id}
+     * Chỉ Admin
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteBranch(@PathVariable Long id) {
         branchService.deleteBranch(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa chi nhánh thành công"));

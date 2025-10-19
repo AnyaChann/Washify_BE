@@ -54,11 +54,11 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Columns: id, name, description
 -- =============================================
 INSERT INTO roles (name, description) VALUES
-('ROLE_ADMIN', 'Quản trị viên hệ thống - Toàn quyền quản lý'),
-('ROLE_MANAGER', 'Quản lý chi nhánh - Quản lý chi nhánh và nhân viên'),
-('ROLE_STAFF', 'Nhân viên - Xử lý đơn hàng và dịch vụ'),
-('ROLE_SHIPPER', 'Shipper - Giao nhận đồ giặt'),
-('ROLE_CUSTOMER', 'Khách hàng - Sử dụng dịch vụ giặt ủi');
+('ADMIN', 'Quản trị viên hệ thống - Toàn quyền quản lý'),
+('MANAGER', 'Quản lý chi nhánh - Quản lý chi nhánh và nhân viên'),
+('STAFF', 'Nhân viên - Xử lý đơn hàng và dịch vụ'),
+('SHIPPER', 'Shipper - Giao nhận đồ giặt'),
+('CUSTOMER', 'Khách hàng - Sử dụng dịch vụ giặt ủi');
 
 -- =============================================
 -- 2. BRANCHES (Chi nhánh)
@@ -104,23 +104,23 @@ INSERT INTO users (full_name, username, email, password, phone, address, is_acti
 -- =============================================
 -- Admin
 INSERT INTO user_roles (user_id, role_id) VALUES 
-(1, 1); -- admin@washify.vn -> ROLE_ADMIN
+(1, 1); -- admin@washify.vn -> ADMIN
 
 -- Managers
 INSERT INTO user_roles (user_id, role_id) VALUES 
-(2, 2), -- manager.quan1@washify.vn -> ROLE_MANAGER
-(3, 2); -- manager.quan3@washify.vn -> ROLE_MANAGER
+(2, 2), -- manager.quan1@washify.vn -> MANAGER
+(3, 2); -- manager.quan3@washify.vn -> MANAGER
 
 -- Staff
 INSERT INTO user_roles (user_id, role_id) VALUES 
-(4, 3), -- staff1@washify.vn -> ROLE_STAFF
-(5, 3); -- staff2@washify.vn -> ROLE_STAFF
+(4, 3), -- staff1@washify.vn -> STAFF
+(5, 3); -- staff2@washify.vn -> STAFF
 
 -- Customers
 INSERT INTO user_roles (user_id, role_id) VALUES 
-(6, 5), -- customer1@gmail.com -> ROLE_CUSTOMER
-(7, 5), -- customer2@gmail.com -> ROLE_CUSTOMER
-(8, 5); -- customer3@gmail.com -> ROLE_CUSTOMER
+(6, 5), -- customer1@gmail.com -> CUSTOMER
+(7, 5), -- customer2@gmail.com -> CUSTOMER
+(8, 5); -- customer3@gmail.com -> CUSTOMER
 
 -- =============================================
 -- 5. SERVICES (Dịch vụ giặt ủi)
