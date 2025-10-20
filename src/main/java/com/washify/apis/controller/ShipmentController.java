@@ -112,4 +112,93 @@ public class ShipmentController {
         ShipmentResponse shipment = shipmentService.assignShipper(id, shipperId);
         return ResponseEntity.ok(ApiResponse.success(shipment, "Gán shipper thành công"));
     }
+    
+    // ========================================
+    // ENHANCEMENTS - Phase 2: Attachment Management
+    // ========================================
+    // NOTE: Simplified implementation for attachment metadata management
+    // Production implementation should include:
+    // - Actual file upload handling with MultipartFile
+    // - File validation (size, format, virus scan)
+    // - Storage service integration (AWS S3, Azure Blob Storage, etc.)
+    // - Image compression and thumbnail generation
+    // - CDN integration for delivery
+    
+    /**
+     * Thêm attachment cho shipment (Proof of Delivery)
+     * POST /api/shipments/{id}/attachments
+     * Shipper upload ảnh giao hàng, Staff/Admin có thể upload
+     * 
+     * TODO: Implement actual file upload with MultipartFile
+     * @RequestParam("file") MultipartFile file
+     */
+    @PostMapping("/{id}/attachments")
+    @PreAuthorize("hasAnyRole('SHIPPER', 'STAFF', 'ADMIN')")
+    public ResponseEntity<ApiResponse<String>> addAttachment(
+            @PathVariable Long id,
+            @RequestParam String fileUrl,
+            @RequestParam(required = false) String fileType) {
+        
+        // TODO: Implement file upload logic
+        // 1. Validate file (size, format)
+        // 2. Upload to storage service
+        // 3. Save attachment metadata to database
+        
+        String message = String.format(
+            "Attachment management endpoint. Shipment ID: %d, FileURL: %s, FileType: %s. " +
+            "TODO: Implement actual file upload with storage service.",
+            id, fileUrl, fileType
+        );
+        
+        return ResponseEntity.ok(ApiResponse.success(message, "Endpoint sẵn sàng cho implementation"));
+    }
+    
+    /**
+     * Lấy danh sách attachments của shipment
+     * GET /api/shipments/{id}/attachments
+     * Staff/Admin/Shipper/Customer có thể xem
+     * 
+     * TODO: Query attachments from database
+     */
+    @GetMapping("/{id}/attachments")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'SHIPPER', 'STAFF', 'ADMIN')")
+    public ResponseEntity<ApiResponse<String>> getAttachments(@PathVariable Long id) {
+        
+        // TODO: Implement query logic
+        // AttachmentRepository.findByShipmentId(id)
+        
+        String message = String.format(
+            "Get attachments endpoint. Shipment ID: %d. " +
+            "TODO: Query attachments from AttachmentRepository.",
+            id
+        );
+        
+        return ResponseEntity.ok(ApiResponse.success(message, "Endpoint sẵn sàng cho implementation"));
+    }
+    
+    /**
+     * Xóa attachment
+     * DELETE /api/shipments/{id}/attachments/{attachmentId}
+     * Chỉ Staff và Admin, hoặc Shipper xóa của mình
+     * 
+     * TODO: Delete attachment file and metadata
+     */
+    @DeleteMapping("/{id}/attachments/{attachmentId}")
+    @PreAuthorize("hasAnyRole('SHIPPER', 'STAFF', 'ADMIN')")
+    public ResponseEntity<ApiResponse<String>> deleteAttachment(
+            @PathVariable Long id,
+            @PathVariable Long attachmentId) {
+        
+        // TODO: Implement delete logic
+        // 1. Delete file from storage service
+        // 2. Delete metadata from database
+        
+        String message = String.format(
+            "Delete attachment endpoint. Shipment ID: %d, Attachment ID: %d. " +
+            "TODO: Delete file from storage and database.",
+            id, attachmentId
+        );
+        
+        return ResponseEntity.ok(ApiResponse.success(message, "Endpoint sẵn sàng cho implementation"));
+    }
 }

@@ -189,4 +189,112 @@ public class OrderService {
                 .subtotal(subtotal)
                 .build();
     }
+    
+    // ========================================
+    // ENHANCEMENTS - Phase 2
+    // ========================================
+    
+    /**
+     * Áp dụng mã khuyến mãi cho đơn hàng
+     */
+    public OrderResponse applyPromotion(Long orderId, String promotionCode) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với ID: " + orderId));
+        
+        // Kiểm tra trạng thái đơn hàng
+        if (order.getStatus() != Order.OrderStatus.PENDING) {
+            throw new RuntimeException("Chỉ có thể áp dụng khuyến mãi cho đơn hàng đang chờ xử lý");
+        }
+        
+        Promotion promotion = promotionRepository.findByCode(promotionCode)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy mã khuyến mãi: " + promotionCode));
+        
+        // Validate promotion
+        if (!promotion.getIsActive()) {
+            throw new RuntimeException("Mã khuyến mãi không còn hoạt động");
+        }
+        
+        if (promotion.getStartDate() != null && promotion.getStartDate().isAfter(java.time.LocalDateTime.now())) {
+            throw new RuntimeException("Mã khuyến mãi chưa có hiệu lực");
+        }
+        
+        if (promotion.getEndDate() != null && promotion.getEndDate().isBefore(java.time.LocalDateTime.now())) {
+            throw new RuntimeException("Mã khuyến mãi đã hết hạn");
+        }
+        
+        // Tính lại tổng tiền
+        BigDecimal totalAmount = order.getOrderItems().stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        // Áp dụng giảm giá
+        if (promotion.getDiscountType() == Promotion.DiscountType.PERCENT) {
+            BigDecimal discount = totalAmount.multiply(promotion.getDiscountValue()).divide(BigDecimal.valueOf(100));
+            totalAmount = totalAmount.subtract(discount);
+        } else {
+            totalAmount = totalAmount.subtract(promotion.getDiscountValue());
+        }
+        
+        // Thêm promotion vào order
+        order.getPromotions().add(promotion);
+        order.setTotalAmount(totalAmount);
+        
+        Order updatedOrder = orderRepository.save(order);
+        return mapToOrderResponse(updatedOrder);
+    }
+    
+    /**
+     * Xóa mã khuyến mãi khỏi đơn hàng
+     */
+    public OrderResponse removePromotion(Long orderId, String promotionCode) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với ID: " + orderId));
+        
+        if (order.getStatus() != Order.OrderStatus.PENDING) {
+            throw new RuntimeException("Chỉ có thể xóa khuyến mãi cho đơn hàng đang chờ xử lý");
+        }
+        
+        Promotion promotion = promotionRepository.findByCode(promotionCode)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy mã khuyến mãi: " + promotionCode));
+        
+        // Xóa promotion
+        order.getPromotions().remove(promotion);
+        
+        // Tính lại tổng tiền
+        recalculateOrderTotal(order);
+        
+        Order updatedOrder = orderRepository.save(order);
+        return mapToOrderResponse(updatedOrder);
+    }
+    
+    /**
+     * Lấy danh sách tất cả orders (Admin/Staff)
+     */
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(this::mapToOrderResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Tính lại tổng tiền đơn hàng với các promotions hiện tại
+     */
+    private void recalculateOrderTotal(Order order) {
+        BigDecimal totalAmount = order.getOrderItems().stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        // Áp dụng các promotions còn lại
+        for (Promotion promotion : order.getPromotions()) {
+            if (promotion.getDiscountType() == Promotion.DiscountType.PERCENT) {
+                BigDecimal discount = totalAmount.multiply(promotion.getDiscountValue()).divide(BigDecimal.valueOf(100));
+                totalAmount = totalAmount.subtract(discount);
+            } else {
+                totalAmount = totalAmount.subtract(promotion.getDiscountValue());
+            }
+        }
+        
+        order.setTotalAmount(totalAmount);
+    }
 }

@@ -126,4 +126,133 @@ public class PaymentService {
                 .amount(payment.getAmount())
                 .build();
     }
+    
+    // ========================================
+    // ENHANCEMENTS - Phase 2
+    // ========================================
+    
+    /**
+     * Hoàn tiền (refund)
+     */
+    public PaymentResponse refundPayment(Long paymentId, String reason) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thanh toán với ID: " + paymentId));
+        
+        // Chỉ hoàn tiền cho payments đã PAID
+        if (payment.getPaymentStatus() != Payment.PaymentStatus.PAID) {
+            throw new RuntimeException("Chỉ có thể hoàn tiền cho thanh toán đã thành công");
+        }
+        
+        // Cập nhật order status về CANCELLED
+        Order order = payment.getOrder();
+        order.setStatus(Order.OrderStatus.CANCELLED);
+        order.setNotes(order.getNotes() + " | REFUND: " + reason);
+        orderRepository.save(order);
+        
+        // Cập nhật payment status về FAILED (hoặc có thể tạo enum mới REFUNDED)
+        payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
+        Payment updatedPayment = paymentRepository.save(payment);
+        
+        return mapToPaymentResponse(updatedPayment);
+    }
+    
+    /**
+     * Webhook handler (giả lập - thực tế cần implement theo payment gateway cụ thể)
+     */
+    public PaymentResponse processWebhook(Long paymentId, String status, String transactionId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thanh toán với ID: " + paymentId));
+        
+        // Xử lý dựa trên status từ webhook
+        if ("SUCCESS".equalsIgnoreCase(status) || "PAID".equalsIgnoreCase(status)) {
+            payment.setPaymentStatus(Payment.PaymentStatus.PAID);
+            
+            // Cập nhật order status
+            Order order = payment.getOrder();
+            order.setStatus(Order.OrderStatus.IN_PROGRESS);
+            orderRepository.save(order);
+        } else if ("FAILED".equalsIgnoreCase(status) || "CANCELLED".equalsIgnoreCase(status)) {
+            payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
+        }
+        
+        Payment updatedPayment = paymentRepository.save(payment);
+        return mapToPaymentResponse(updatedPayment);
+    }
+    
+    /**
+     * Lấy payments theo phương thức thanh toán
+     */
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> getPaymentsByMethod(String method) {
+        Payment.PaymentMethod paymentMethod = Payment.PaymentMethod.valueOf(method);
+        return paymentRepository.findByPaymentMethod(paymentMethod).stream()
+                .map(this::mapToPaymentResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Lấy payments trong khoảng thời gian
+     */
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> getPaymentsByDateRange(
+            java.time.LocalDateTime startDate, 
+            java.time.LocalDateTime endDate) {
+        return paymentRepository.findByPaymentDateBetween(startDate, endDate).stream()
+                .map(this::mapToPaymentResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Thống kê doanh thu
+     */
+    @Transactional(readOnly = true)
+    public PaymentStatistics getPaymentStatistics() {
+        // Tổng doanh thu từ payments đã thanh toán
+        Double totalRevenue = paymentRepository.sumAmountByPaymentStatus(Payment.PaymentStatus.PAID);
+        
+        // Số lượng payments theo status
+        long totalPaid = paymentRepository.findByPaymentStatus(Payment.PaymentStatus.PAID).size();
+        long totalPending = paymentRepository.findByPaymentStatus(Payment.PaymentStatus.PENDING).size();
+        long totalFailed = paymentRepository.findByPaymentStatus(Payment.PaymentStatus.FAILED).size();
+        
+        // Số lượng theo method
+        long cashCount = paymentRepository.findByPaymentMethod(Payment.PaymentMethod.CASH).size();
+        long cardCount = paymentRepository.findByPaymentMethod(Payment.PaymentMethod.CARD).size();
+        long onlineCount = paymentRepository.findByPaymentMethod(Payment.PaymentMethod.ONLINE).size();
+        
+        return new PaymentStatistics(
+            totalRevenue != null ? totalRevenue : 0.0,
+            totalPaid,
+            totalPending,
+            totalFailed,
+            cashCount,
+            cardCount,
+            onlineCount
+        );
+    }
+    
+    /**
+     * Inner class cho payment statistics
+     */
+    public static class PaymentStatistics {
+        public final double totalRevenue;
+        public final long totalPaid;
+        public final long totalPending;
+        public final long totalFailed;
+        public final long cashPayments;
+        public final long cardPayments;
+        public final long onlinePayments;
+        
+        public PaymentStatistics(double totalRevenue, long totalPaid, long totalPending, 
+                               long totalFailed, long cashPayments, long cardPayments, 
+                               long onlinePayments) {
+            this.totalRevenue = totalRevenue;
+            this.totalPaid = totalPaid;
+            this.totalPending = totalPending;
+            this.totalFailed = totalFailed;
+            this.cashPayments = cashPayments;
+            this.cardPayments = cardPayments;
+            this.onlinePayments = onlinePayments;
+        }
+    }
 }

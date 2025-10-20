@@ -163,4 +163,10 @@ public class ShipmentService {
                 .deliveryDate(shipment.getDeliveryDate())
                 .build();
     }
+    
+    // ========================================
+    // ENHANCEMENTS - Phase 2: Attachment Management
+    // ========================================
+    // Note: File upload implementation is simplified
+    // Production should use proper file storage service (S3, Azure Blob, etc.)
 }

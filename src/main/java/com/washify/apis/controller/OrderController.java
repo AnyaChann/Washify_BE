@@ -98,4 +98,48 @@ public class OrderController {
         OrderResponse order = orderService.cancelOrder(id);
         return ResponseEntity.ok(ApiResponse.success(order, "Hủy đơn hàng thành công"));
     }
+    
+    // ========================================
+    // ENHANCEMENTS - Phase 2
+    // ========================================
+    
+    /**
+     * Lấy tất cả đơn hàng
+     * GET /api/orders
+     * Chỉ Admin và Staff
+     */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getAllOrders() {
+        List<OrderResponse> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(ApiResponse.success(orders, "Lấy danh sách đơn hàng thành công"));
+    }
+    
+    /**
+     * Áp dụng mã khuyến mãi cho đơn hàng
+     * POST /api/orders/{id}/promotions
+     * Customer áp dụng cho đơn của mình, Staff/Admin áp dụng cho bất kỳ đơn nào
+     */
+    @PostMapping("/{id}/promotions")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'STAFF', 'ADMIN')")
+    public ResponseEntity<ApiResponse<OrderResponse>> applyPromotion(
+            @PathVariable Long id,
+            @RequestParam String code) {
+        OrderResponse order = orderService.applyPromotion(id, code);
+        return ResponseEntity.ok(ApiResponse.success(order, "Áp dụng mã khuyến mãi thành công"));
+    }
+    
+    /**
+     * Xóa mã khuyến mãi khỏi đơn hàng
+     * DELETE /api/orders/{id}/promotions
+     * Customer xóa khỏi đơn của mình, Staff/Admin xóa khỏi bất kỳ đơn nào
+     */
+    @DeleteMapping("/{id}/promotions")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'STAFF', 'ADMIN')")
+    public ResponseEntity<ApiResponse<OrderResponse>> removePromotion(
+            @PathVariable Long id,
+            @RequestParam String code) {
+        OrderResponse order = orderService.removePromotion(id, code);
+        return ResponseEntity.ok(ApiResponse.success(order, "Xóa mã khuyến mãi thành công"));
+    }
 }
