@@ -172,6 +172,34 @@ public class GlobalExceptionHandler {
     }
     
     /**
+     * Xử lý EmailSendException
+     */
+    @ExceptionHandler(EmailSendException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEmailSendException(EmailSendException ex) {
+        log.error("Email send failed: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ApiResponse.<Void>builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .timestamp(java.time.LocalDateTime.now())
+                        .build());
+    }
+    
+    /**
+     * Xử lý InvalidPasswordResetTokenException
+     */
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidPasswordResetTokenException(InvalidPasswordResetTokenException ex) {
+        log.error("Invalid password reset token: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.<Void>builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .timestamp(java.time.LocalDateTime.now())
+                        .build());
+    }
+    
+    /**
      * Xử lý RuntimeException chung
      */
     @ExceptionHandler(RuntimeException.class)

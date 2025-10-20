@@ -1,9 +1,13 @@
 package com.washify.apis.controller;
 
+import com.washify.apis.dto.request.ChangePasswordRequest;
 import com.washify.apis.dto.request.UserRegistrationRequest;
 import com.washify.apis.dto.request.UserUpdateRequest;
 import com.washify.apis.dto.response.ApiResponse;
 import com.washify.apis.dto.response.UserResponse;
+import com.washify.apis.entity.User;
+import com.washify.apis.service.PasswordChange2FAService;
+import com.washify.apis.service.PasswordChangeService;
 import com.washify.apis.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +27,8 @@ import java.util.List;
 public class UserController {
     
     private final UserService userService;
+    private final PasswordChangeService passwordChangeService;
+    private final PasswordChange2FAService passwordChange2FAService;
     
     /**
      * Lấy thông tin user theo ID
@@ -99,4 +105,58 @@ public class UserController {
         UserResponse user = userService.assignRole(id, roleName);
         return ResponseEntity.ok(ApiResponse.success(user, "Gán role thành công"));
     }
+    
+    /**
+     * Đổi mật khẩu (với tùy chọn email verification)
+     * POST /api/users/{id}/change-password
+     * Admin hoặc chính user đó
+     * 
+     * Flow:
+     * - Nếu user BẬT bảo mật 2 lớp → Gửi email xác nhận
+     * - Nếu user TẮT bảo mật 2 lớp → Đổi ngay lập tức
+     */
+    @PostMapping("/{id}/change-password")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        
+        // Get user để check setting
+        User user = userService.getUserEntityById(id);
+        
+        // Check xem user có bật bảo mật 2 lớp không
+        if (Boolean.TRUE.equals(user.getRequireEmailVerificationForPasswordChange())) {
+            // MODE 1: Gửi email xác nhận (bảo mật cao)
+            passwordChangeService.requestPasswordChange(id, request);
+            return ResponseEntity.ok(ApiResponse.success(
+                "Email xác nhận đã được gửi. Vui lòng kiểm tra hộp thư để hoàn tất việc đổi mật khẩu."
+            ));
+        } else {
+            // MODE 2: Đổi ngay lập tức (nhanh chóng)
+            userService.changePassword(id, request.getCurrentPassword(), request.getNewPassword());
+            return ResponseEntity.ok(ApiResponse.success(
+                "Đổi mật khẩu thành công."
+            ));
+        }
+    }
+    
+    /**
+     * Request bật/tắt bảo mật 2 lớp cho việc đổi password (Gửi email xác nhận)
+     * PUT /api/users/{id}/security/password-change-2fa
+     * Admin hoặc chính user đó
+     */
+    @PutMapping("/{id}/security/password-change-2fa")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    public ResponseEntity<ApiResponse<Void>> togglePasswordChange2FA(
+            @PathVariable Long id,
+            @RequestParam boolean enable) {
+        
+        passwordChange2FAService.request2FAToggle(id, enable);
+        
+        String message = "Email xác nhận đã được gửi. Vui lòng kiểm tra hộp thư để hoàn tất việc " 
+            + (enable ? "bật" : "tắt") + " bảo mật 2 lớp.";
+        
+        return ResponseEntity.ok(ApiResponse.success(message));
+    }
 }
+

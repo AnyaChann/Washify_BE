@@ -24,6 +24,7 @@ public class UserResponse {
     private String phone;
     private String address;
     private Boolean isActive;
+    private Boolean requireEmailVerificationForPasswordChange; // Bảo mật 2 lớp cho đổi password
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;

@@ -52,6 +52,9 @@ public class User {
     @Column(name = "is_active")
     private Boolean isActive = true; // Trạng thái hoạt động
     
+    @Column(name = "require_email_verification_for_password_change")
+    private Boolean requireEmailVerificationForPasswordChange = false; // Bảo mật 2 lớp cho đổi password (mặc định: tắt)
+    
     @CreationTimestamp // Tự động set thời gian tạo
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
