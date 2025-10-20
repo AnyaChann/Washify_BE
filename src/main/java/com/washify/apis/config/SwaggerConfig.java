@@ -30,6 +30,7 @@ public class SwaggerConfig {
                         .version("1.0.0")
                         .description("""
                                 API documentation for Washify - Laundry Management System
+                                
                                 Hầu hết APIs yêu cầu JWT token. Sử dụng endpoint /api/auth/login để lấy token.
 
                                 """)
