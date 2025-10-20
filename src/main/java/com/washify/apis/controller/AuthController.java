@@ -12,6 +12,7 @@ import com.washify.apis.exception.DuplicateResourceException;
 import com.washify.apis.repository.RoleRepository;
 import com.washify.apis.repository.UserRepository;
 import com.washify.apis.security.JwtTokenProvider;
+import com.washify.apis.service.EmailVerificationService;
 import com.washify.apis.util.ValidationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,6 +47,7 @@ public class AuthController {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final EmailVerificationService emailVerificationService;
 
     /**
      * Đăng nhập
@@ -99,6 +101,25 @@ public class AuthController {
     @Operation(summary = "Đăng ký", description = "Đăng ký tài khoản khách hàng mới")
     public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest registerRequest) {
         log.info("Register attempt for user: {}", registerRequest.getUsername());
+
+        // ===== EMAIL VERIFICATION =====
+        // Level 1: Format validation
+        if (!emailVerificationService.isValidFormat(registerRequest.getEmail())) {
+            throw new BadRequestException("Email không hợp lệ: Format sai");
+        }
+
+        // Level 2: Disposable email check
+        if (emailVerificationService.isDisposableEmail(registerRequest.getEmail())) {
+            throw new BadRequestException("Email không hợp lệ: Không chấp nhận email tạm thời/ảo");
+        }
+
+        // Level 3: MX record check (verify domain can receive emails)
+        if (!emailVerificationService.hasMXRecord(registerRequest.getEmail())) {
+            throw new BadRequestException("Email không hợp lệ: Domain không tồn tại hoặc không thể nhận email");
+        }
+        
+        log.info("Email {} verified successfully", registerRequest.getEmail());
+        // ===== END EMAIL VERIFICATION =====
 
         // Validate
         if (!ValidationUtils.isValidEmail(registerRequest.getEmail())) {

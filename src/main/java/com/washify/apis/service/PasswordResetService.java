@@ -28,6 +28,7 @@ public class PasswordResetService {
     private final PasswordResetTokenRepository tokenRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
     
     private static final int EXPIRY_MINUTES = 30; // Token hết hạn sau 30 phút
     
@@ -36,6 +37,28 @@ public class PasswordResetService {
      * Tạo token và gửi email với link reset
      */
     public void createPasswordResetToken(String email) {
+        // ===== EMAIL VERIFICATION =====
+        // Verify email format và tồn tại trước khi tìm user
+        log.info("Verifying email: {}", email);
+        
+        if (!emailVerificationService.isValidFormat(email)) {
+            log.warn("Invalid email format: {}", email);
+            throw new ResourceNotFoundException("User", "email", email);
+        }
+        
+        if (emailVerificationService.isDisposableEmail(email)) {
+            log.warn("Disposable email detected: {}", email);
+            throw new ResourceNotFoundException("User", "email", email);
+        }
+        
+        if (!emailVerificationService.hasMXRecord(email)) {
+            log.warn("Email domain has no MX records: {}", email);
+            throw new ResourceNotFoundException("User", "email", email);
+        }
+        
+        log.info("Email {} verified successfully", email);
+        // ===== END EMAIL VERIFICATION =====
+        
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
         
