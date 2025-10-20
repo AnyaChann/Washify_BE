@@ -539,4 +539,47 @@ public class OrderService {
                 .map(this::mapToOrderResponseSimple)
                 .collect(Collectors.toList());
     }
+    
+    // ========================================
+    // BATCH OPERATIONS
+    // ========================================
+    
+    /**
+     * Cập nhật status cho nhiều orders cùng lúc
+     */
+    public int batchUpdateStatus(List<Long> orderIds, String status) {
+        Order.OrderStatus orderStatus;
+        try {
+            orderStatus = Order.OrderStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Trạng thái không hợp lệ: " + status);
+        }
+        
+        int count = 0;
+        for (Long orderId : orderIds) {
+            Order order = orderRepository.findById(orderId).orElse(null);
+            if (order != null) {
+                order.setStatus(orderStatus);
+                orderRepository.save(order);
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    /**
+     * Hủy nhiều orders cùng lúc
+     */
+    public int batchCancelOrders(List<Long> orderIds) {
+        int count = 0;
+        for (Long orderId : orderIds) {
+            Order order = orderRepository.findById(orderId).orElse(null);
+            if (order != null && order.getStatus() == Order.OrderStatus.PENDING) {
+                order.setStatus(Order.OrderStatus.CANCELLED);
+                orderRepository.save(order);
+                count++;
+            }
+        }
+        return count;
+    }
 }

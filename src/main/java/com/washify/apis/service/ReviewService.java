@@ -96,6 +96,17 @@ public class ReviewService {
     }
     
     /**
+     * Lấy danh sách đánh giá theo service
+     * PHASE 3: Operational Enhancements
+     */
+    @Transactional(readOnly = true)
+    public List<ReviewResponse> getReviewsByServiceId(Long serviceId) {
+        return reviewRepository.findByServiceId(serviceId).stream()
+                .map(this::mapToReviewResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
      * Lấy tất cả đánh giá
      */
     @Transactional(readOnly = true)

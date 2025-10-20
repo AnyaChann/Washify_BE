@@ -70,6 +70,21 @@ public class ReviewController {
     }
     
     /**
+     * Lấy danh sách đánh giá theo service
+     * GET /api/reviews/service/{serviceId}
+     * PHASE 3: Operational Enhancements
+     */
+    @GetMapping("/service/{serviceId}")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Lấy đánh giá theo service",
+        description = "Lấy tất cả đánh giá cho một service cụ thể"
+    )
+    public ResponseEntity<ApiResponse<List<ReviewResponse>>> getReviewsByServiceId(@PathVariable Long serviceId) {
+        List<ReviewResponse> reviews = reviewService.getReviewsByServiceId(serviceId);
+        return ResponseEntity.ok(ApiResponse.success(reviews, "Lấy danh sách đánh giá theo service thành công"));
+    }
+    
+    /**
      * Lấy tất cả đánh giá
      * GET /api/reviews
      */

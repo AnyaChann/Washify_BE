@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/api/notifications")
 @RequiredArgsConstructor
 @Tag(name = "🔔 Notifications", description = "Quản lý thông báo, đánh dấu đã đọc")
 @SecurityRequirement(name = "bearerAuth")
@@ -74,6 +74,51 @@ public class NotificationController {
         return ResponseEntity.ok(ApiResponse.<Void>builder()
                 .success(true)
                 .message("Gửi thông báo hàng loạt thành công")
+                .timestamp(LocalDateTime.now())
+                .build());
+    }
+
+    /**
+     * Lấy tất cả notifications (Admin/Staff)
+     * GET /api/notifications
+     */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @Operation(summary = "Lấy tất cả thông báo", description = "Lấy tất cả thông báo trong hệ thống (Admin/Staff only)")
+    public ResponseEntity<ApiResponse<Page<NotificationResponse>>> getAllNotifications(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<NotificationResponse> notifications = notificationService.getAllNotifications(pageable);
+        
+        return ResponseEntity.ok(ApiResponse.<Page<NotificationResponse>>builder()
+                .success(true)
+                .message("Lấy tất cả thông báo thành công")
+                .data(notifications)
+                .timestamp(LocalDateTime.now())
+                .build());
+    }
+
+    /**
+     * Lấy notifications của một user cụ thể (Admin/Staff)
+     * GET /api/notifications/user/{userId}
+     */
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @Operation(summary = "Lấy thông báo của user", description = "Lấy thông báo của một user cụ thể (Admin/Staff only)")
+    public ResponseEntity<ApiResponse<Page<NotificationResponse>>> getUserNotificationsById(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<NotificationResponse> notifications = notificationService.getUserNotifications(userId, pageable);
+        
+        return ResponseEntity.ok(ApiResponse.<Page<NotificationResponse>>builder()
+                .success(true)
+                .message("Lấy thông báo của user thành công")
+                .data(notifications)
                 .timestamp(LocalDateTime.now())
                 .build());
     }

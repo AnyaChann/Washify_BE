@@ -217,5 +217,53 @@ public class UserController {
         List<UserResponse> users = userService.getActiveUsers();
         return ResponseEntity.ok(ApiResponse.success(users, "Lấy danh sách users hoạt động thành công"));
     }
+    
+    // ========================================
+    // BATCH OPERATIONS
+    // ========================================
+    
+    /**
+     * Kích hoạt nhiều users cùng lúc
+     * PATCH /api/users/batch/activate
+     * Chỉ Admin
+     */
+    @PatchMapping("/batch/activate")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "Kích hoạt nhiều users",
+        description = "Kích hoạt nhiều users cùng lúc (set is_active = true). Chỉ ADMIN."
+    )
+    public ResponseEntity<ApiResponse<Integer>> batchActivateUsers(
+            @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Danh sách user IDs cần kích hoạt") 
+            java.util.Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
+        List<Long> userIds = (List<Long>) request.get("userIds");
+        
+        int activatedCount = userService.batchActivateUsers(userIds);
+        return ResponseEntity.ok(ApiResponse.success(activatedCount, 
+            "Kích hoạt " + activatedCount + " users thành công"));
+    }
+    
+    /**
+     * Vô hiệu hóa nhiều users cùng lúc
+     * PATCH /api/users/batch/deactivate
+     * Chỉ Admin
+     */
+    @PatchMapping("/batch/deactivate")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+        summary = "Vô hiệu hóa nhiều users",
+        description = "Vô hiệu hóa nhiều users cùng lúc (set is_active = false). Chỉ ADMIN."
+    )
+    public ResponseEntity<ApiResponse<Integer>> batchDeactivateUsers(
+            @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Danh sách user IDs cần vô hiệu hóa") 
+            java.util.Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
+        List<Long> userIds = (List<Long>) request.get("userIds");
+        
+        int deactivatedCount = userService.batchDeactivateUsers(userIds);
+        return ResponseEntity.ok(ApiResponse.success(deactivatedCount, 
+            "Vô hiệu hóa " + deactivatedCount + " users thành công"));
+    }
 }
 

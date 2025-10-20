@@ -80,6 +80,17 @@ public class NotificationService {
     }
 
     /**
+     * Lấy tất cả thông báo (Admin/Staff)
+     */
+    @Transactional(readOnly = true)
+    public Page<NotificationResponse> getAllNotifications(Pageable pageable) {
+        log.info("Getting all notifications with pagination");
+
+        return notificationRepository.findAll(pageable)
+                .map(this::mapToResponse);
+    }
+
+    /**
      * Lấy tất cả thông báo của user
      */
     @Transactional(readOnly = true)

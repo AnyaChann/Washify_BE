@@ -51,6 +51,18 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Double findAverageRating();
     
     /**
+     * Tìm reviews theo service ID
+     * Join qua Order -> OrderItem -> Service
+     * @param serviceId ID của service
+     * @return Danh sách reviews
+     */
+    @Query("SELECT DISTINCT r FROM Review r " +
+           "JOIN r.order o " +
+           "JOIN o.orderItems oi " +
+           "WHERE oi.service.id = :serviceId")
+    List<Review> findByServiceId(Long serviceId);
+    
+    /**
      * Đếm số reviews theo rating
      * @param rating Điểm đánh giá
      * @return Số lượng reviews

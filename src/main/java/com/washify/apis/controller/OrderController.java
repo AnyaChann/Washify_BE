@@ -278,4 +278,53 @@ public class OrderController {
         List<OrderResponse> orders = orderService.getOrdersByDateRange(startDate, endDate);
         return ResponseEntity.ok(ApiResponse.success(orders, "Lấy danh sách orders thành công"));
     }
+    
+    // ========================================
+    // BATCH OPERATIONS
+    // ========================================
+    
+    /**
+     * Cập nhật status cho nhiều orders cùng lúc
+     * PATCH /api/orders/batch/status
+     * Chỉ Admin và Staff
+     */
+    @PatchMapping("/batch/status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Cập nhật status nhiều orders",
+        description = "Cập nhật status cho nhiều orders cùng lúc. Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<Integer>> batchUpdateStatus(
+            @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Danh sách order IDs và status mới") 
+            java.util.Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
+        List<Long> orderIds = (List<Long>) request.get("orderIds");
+        String status = (String) request.get("status");
+        
+        int updatedCount = orderService.batchUpdateStatus(orderIds, status);
+        return ResponseEntity.ok(ApiResponse.success(updatedCount, 
+            "Cập nhật status cho " + updatedCount + " orders thành công"));
+    }
+    
+    /**
+     * Hủy nhiều orders cùng lúc
+     * DELETE /api/orders/batch
+     * Chỉ Admin và Staff
+     */
+    @DeleteMapping("/batch")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Hủy nhiều orders",
+        description = "Hủy nhiều orders cùng lúc (set status = CANCELLED). Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<Integer>> batchCancelOrders(
+            @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Danh sách order IDs cần hủy") 
+            java.util.Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
+        List<Long> orderIds = (List<Long>) request.get("orderIds");
+        
+        int cancelledCount = orderService.batchCancelOrders(orderIds);
+        return ResponseEntity.ok(ApiResponse.success(cancelledCount, 
+            "Hủy " + cancelledCount + " orders thành công"));
+    }
 }

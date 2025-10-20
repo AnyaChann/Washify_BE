@@ -237,4 +237,42 @@ public class UserService {
                 .map(this::mapToUserResponse)
                 .collect(Collectors.toList());
     }
+    
+    // ========================================
+    // BATCH OPERATIONS
+    // ========================================
+    
+    /**
+     * Kích hoạt nhiều users cùng lúc
+     */
+    public int batchActivateUsers(List<Long> userIds) {
+        int count = 0;
+        for (Long userId : userIds) {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                user.setIsActive(true);
+                userRepository.save(user);
+                count++;
+            }
+        }
+        log.info("Đã kích hoạt {} users", count);
+        return count;
+    }
+    
+    /**
+     * Vô hiệu hóa nhiều users cùng lúc
+     */
+    public int batchDeactivateUsers(List<Long> userIds) {
+        int count = 0;
+        for (Long userId : userIds) {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                user.setIsActive(false);
+                userRepository.save(user);
+                count++;
+            }
+        }
+        log.info("Đã vô hiệu hóa {} users", count);
+        return count;
+    }
 }

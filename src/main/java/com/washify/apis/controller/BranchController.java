@@ -111,5 +111,44 @@ public class BranchController {
         BranchService.BranchDetailStatistics statistics = branchService.getBranchDetailStatistics(id);
         return ResponseEntity.ok(ApiResponse.success(statistics, "Lấy thống kê chi tiết chi nhánh thành công"));
     }
+    
+    // ========================================
+    // OPERATIONAL ENHANCEMENTS - Phase 3
+    // ========================================
+    
+    /**
+     * Tìm kiếm chi nhánh theo nhiều tiêu chí
+     * GET /api/branches/search
+     */
+    @GetMapping("/search")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Tìm kiếm chi nhánh",
+        description = "Tìm kiếm chi nhánh theo tên, địa chỉ hoặc trạng thái active. Tất cả parameters đều optional."
+    )
+    public ResponseEntity<ApiResponse<List<BranchResponse>>> searchBranches(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) Boolean isActive) {
+        List<BranchResponse> branches = branchService.searchBranches(name, address, isActive);
+        return ResponseEntity.ok(ApiResponse.success(branches, "Tìm kiếm chi nhánh thành công"));
+    }
+    
+    /**
+     * Tìm chi nhánh gần vị trí người dùng
+     * GET /api/branches/nearby
+     */
+    @GetMapping("/nearby")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Tìm chi nhánh gần đây",
+        description = "Tìm các chi nhánh trong bán kính (km) từ vị trí hiện tại. Radius mặc định là 10km."
+    )
+    public ResponseEntity<ApiResponse<List<BranchResponse>>> findNearbyBranches(
+            @RequestParam Double lat,
+            @RequestParam Double lng,
+            @RequestParam(defaultValue = "10.0") Double radius) {
+        List<BranchResponse> branches = branchService.findNearbyBranches(lat, lng, radius);
+        return ResponseEntity.ok(ApiResponse.success(branches, 
+            "Tìm thấy " + branches.size() + " chi nhánh trong bán kính " + radius + " km"));
+    }
 }
 

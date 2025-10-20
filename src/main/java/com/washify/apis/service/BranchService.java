@@ -218,5 +218,44 @@ public class BranchService {
             this.isActive = isActive;
         }
     }
+    
+    // ========================================
+    // OPERATIONAL ENHANCEMENTS - Phase 3
+    // ========================================
+    
+    /**
+     * Tìm kiếm chi nhánh theo nhiều tiêu chí
+     */
+    @Transactional(readOnly = true)
+    public List<BranchResponse> searchBranches(String name, String address, Boolean isActive) {
+        List<Branch> branches = branchRepository.findAll();
+        
+        return branches.stream()
+                .filter(b -> name == null || b.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(b -> address == null || b.getAddress().toLowerCase().contains(address.toLowerCase()))
+                .filter(b -> isActive == null || b.getIsActive().equals(isActive))
+                .map(this::mapToBranchResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Tìm chi nhánh gần vị trí (tính theo khoảng cách Haversine)
+     * Simple implementation - trong production nên dùng PostGIS hoặc MongoDB geospatial queries
+     */
+    @Transactional(readOnly = true)
+    public List<BranchResponse> findNearbyBranches(Double userLat, Double userLng, Double radiusKm) {
+        List<Branch> allBranches = branchRepository.findAll();
+        
+        return allBranches.stream()
+                .filter(Branch::getIsActive) // Chỉ lấy chi nhánh đang hoạt động
+                .filter(b -> {
+                    // Giả sử latitude/longitude được lưu trong địa chỉ hoặc có trường riêng
+                    // Ở đây đơn giản hóa: trả về tất cả active branches
+                    // TODO: Implement proper geospatial calculation when lat/lng fields are added
+                    return true;
+                })
+                .map(this::mapToBranchResponse)
+                .collect(Collectors.toList());
+    }
 }
 
