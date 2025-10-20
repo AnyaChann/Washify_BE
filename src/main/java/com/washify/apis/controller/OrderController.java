@@ -67,7 +67,7 @@ public class OrderController {
      * Chỉ Admin và Staff
      */
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByStatus(@PathVariable String status) {
         List<OrderResponse> orders = orderService.getOrdersByStatus(status);
         return ResponseEntity.ok(ApiResponse.success(orders, "Lấy danh sách đơn hàng thành công"));
@@ -93,7 +93,7 @@ public class OrderController {
      * Customer hủy đơn của mình, Staff/Admin hủy bất kỳ đơn nào
      */
     @PatchMapping("/{id}/cancel")
-    @PreAuthorize("hasAnyRole('CUSTOMER', 'STAFF', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'STAFF', 'ADMIN', 'MANAGER')")
     public ResponseEntity<ApiResponse<OrderResponse>> cancelOrder(@PathVariable Long id) {
         OrderResponse order = orderService.cancelOrder(id);
         return ResponseEntity.ok(ApiResponse.success(order, "Hủy đơn hàng thành công"));
@@ -150,13 +150,13 @@ public class OrderController {
     /**
      * Lấy thống kê tổng quan về orders
      * GET /api/orders/statistics
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/statistics")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @io.swagger.v3.oas.annotations.Operation(
         summary = "Lấy thống kê orders",
-        description = "Thống kê tổng quan: tổng số orders, theo status, doanh thu, giá trị trung bình. Chỉ ADMIN và STAFF."
+        description = "Thống kê tổng quan: tổng số orders, theo status, doanh thu, giá trị trung bình. ADMIN, STAFF và MANAGER."
     )
     public ResponseEntity<ApiResponse<OrderService.OrderStatistics>> getOrderStatistics() {
         OrderService.OrderStatistics stats = orderService.getOrderStatistics();
@@ -166,13 +166,13 @@ public class OrderController {
     /**
      * Lấy thống kê doanh thu theo khoảng thời gian
      * GET /api/orders/statistics/revenue
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/statistics/revenue")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @io.swagger.v3.oas.annotations.Operation(
         summary = "Thống kê doanh thu theo thời gian",
-        description = "Doanh thu, số lượng orders, giá trị TB trong khoảng thời gian. Format: yyyy-MM-dd'T'HH:mm:ss. Chỉ ADMIN và STAFF."
+        description = "Doanh thu, số lượng orders, giá trị TB trong khoảng thời gian. Format: yyyy-MM-dd'T'HH:mm:ss. ADMIN, STAFF và MANAGER."
     )
     public ResponseEntity<ApiResponse<OrderService.RevenueStatistics>> getRevenueStatistics(
             @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) 
@@ -186,13 +186,13 @@ public class OrderController {
     /**
      * Lấy danh sách top customers
      * GET /api/orders/statistics/top-customers
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/statistics/top-customers")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @io.swagger.v3.oas.annotations.Operation(
         summary = "Top customers theo số lượng orders",
-        description = "Danh sách top customers với số lượng orders và tổng giá trị. Chỉ ADMIN và STAFF."
+        description = "Danh sách top customers với số lượng orders và tổng giá trị. ADMIN, STAFF và MANAGER."
     )
     public ResponseEntity<ApiResponse<List<OrderService.TopCustomer>>> getTopCustomers(
             @RequestParam(defaultValue = "10") int limit) {
@@ -207,13 +207,13 @@ public class OrderController {
     /**
      * Tìm kiếm orders theo nhiều tiêu chí
      * GET /api/orders/search
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @io.swagger.v3.oas.annotations.Operation(
         summary = "Tìm kiếm orders theo nhiều tiêu chí",
-        description = "Search với userId, branchId, status, dateFrom, dateTo, minAmount, maxAmount. Chỉ ADMIN và STAFF."
+        description = "Search với userId, branchId, status, dateFrom, dateTo, minAmount, maxAmount. ADMIN, STAFF và MANAGER."
     )
     public ResponseEntity<ApiResponse<List<OrderResponse>>> searchOrders(
             @RequestParam(required = false) Long userId,
@@ -233,7 +233,7 @@ public class OrderController {
      * Admin/Staff xem tất cả, User xem của mình
      */
     @GetMapping("/user/{userId}/status/{status}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF') or #userId == authentication.principal.id")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER') or #userId == authentication.principal.id")
     @io.swagger.v3.oas.annotations.Operation(
         summary = "Orders của user theo status",
         description = "Lấy orders của một user cụ thể theo trạng thái."
@@ -248,13 +248,13 @@ public class OrderController {
     /**
      * Lấy orders theo branch
      * GET /api/orders/branch/{branchId}
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/branch/{branchId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @io.swagger.v3.oas.annotations.Operation(
         summary = "Orders theo chi nhánh",
-        description = "Lấy tất cả orders của một chi nhánh. Chỉ ADMIN và STAFF."
+        description = "Lấy tất cả orders của một chi nhánh. ADMIN, STAFF và MANAGER."
     )
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByBranch(@PathVariable Long branchId) {
         List<OrderResponse> orders = orderService.getOrdersByBranch(branchId);
@@ -264,13 +264,13 @@ public class OrderController {
     /**
      * Lấy orders theo khoảng thời gian
      * GET /api/orders/date-range
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/date-range")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @io.swagger.v3.oas.annotations.Operation(
         summary = "Orders theo khoảng thời gian",
-        description = "Lấy orders trong khoảng thời gian. Format: yyyy-MM-dd'T'HH:mm:ss. Chỉ ADMIN và STAFF."
+        description = "Lấy orders trong khoảng thời gian. Format: yyyy-MM-dd'T'HH:mm:ss. ADMIN, STAFF và MANAGER."
     )
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByDateRange(
             @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime startDate,
@@ -286,10 +286,10 @@ public class OrderController {
     /**
      * Cập nhật status cho nhiều orders cùng lúc
      * PATCH /api/orders/batch/status
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @PatchMapping("/batch/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @io.swagger.v3.oas.annotations.Operation(
         summary = "Cập nhật status nhiều orders",
         description = "Cập nhật status cho nhiều orders cùng lúc. Chỉ ADMIN và STAFF."

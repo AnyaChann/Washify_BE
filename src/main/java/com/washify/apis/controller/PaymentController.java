@@ -55,7 +55,7 @@ public class PaymentController {
      * Admin/Staff xem tất cả, Customer xem của mình
      */
     @GetMapping("/order/{orderId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'CUSTOMER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER', 'CUSTOMER')")
     public ResponseEntity<ApiResponse<PaymentResponse>> getPaymentByOrderId(@PathVariable Long orderId) {
         PaymentResponse payment = paymentService.getPaymentByOrderId(orderId);
         return ResponseEntity.ok(ApiResponse.success(payment, "Lấy thông tin thanh toán thành công"));
@@ -79,7 +79,7 @@ public class PaymentController {
      * Chỉ Staff và Admin
      */
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN', 'MANAGER')")
     public ResponseEntity<ApiResponse<PaymentResponse>> updatePaymentStatus(
             @PathVariable Long id,
             @RequestParam String status) {
@@ -121,7 +121,7 @@ public class PaymentController {
      * Chỉ Admin
      */
     @PostMapping("/{id}/refund")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<ApiResponse<PaymentResponse>> refundPayment(
             @PathVariable Long id,
             @RequestParam String reason) {
@@ -149,7 +149,7 @@ public class PaymentController {
      * Chỉ Admin và Staff
      */
     @GetMapping("/statistics")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<PaymentService.PaymentStatistics>> getPaymentStatistics() {
         PaymentService.PaymentStatistics stats = paymentService.getPaymentStatistics();
         return ResponseEntity.ok(ApiResponse.success(stats, "Lấy thống kê thanh toán thành công"));
@@ -158,10 +158,10 @@ public class PaymentController {
     /**
      * Lấy payments theo phương thức thanh toán
      * GET /api/payments/method/{method}
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/method/{method}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<List<PaymentResponse>>> getPaymentsByMethod(@PathVariable String method) {
         List<PaymentResponse> payments = paymentService.getPaymentsByMethod(method);
         return ResponseEntity.ok(ApiResponse.success(payments, "Lấy danh sách thanh toán thành công"));
@@ -170,10 +170,10 @@ public class PaymentController {
     /**
      * Lấy payments trong khoảng thời gian
      * GET /api/payments/date-range
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/date-range")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<List<PaymentResponse>>> getPaymentsByDateRange(
             @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) 
             java.time.LocalDateTime startDate,

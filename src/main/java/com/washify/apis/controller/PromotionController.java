@@ -33,8 +33,8 @@ public class PromotionController {
      * Chỉ Staff và Admin
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    @Operation(summary = "Tạo mã giảm giá mới", description = "**Access:** 👔 Staff/Admin\n\nTạo mã khuyến mãi mới cho hệ thống")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN', 'MANAGER')")
+    @Operation(summary = "Tạo mã giảm giá mới", description = "**Access:** 👔 Staff/Admin/Manager\n\nTạo mã khuyến mãi mới cho hệ thống")
     public ResponseEntity<ApiResponse<PromotionResponse>> createPromotion(@Valid @RequestBody PromotionRequest request) {
         PromotionResponse promotion = promotionService.createPromotion(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -71,8 +71,8 @@ public class PromotionController {
      * Chỉ Staff và Admin
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    @Operation(summary = "Lấy tất cả mã giảm giá", description = "**Access:** 👔 Staff/Admin\n\nLấy danh sách tất cả mã khuyến mãi (bao gồm inactive và expired)")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN', 'MANAGER')")
+    @Operation(summary = "Lấy tất cả mã giảm giá", description = "**Access:** 👔 Staff/Admin/Manager\n\nLấy danh sách tất cả mã khuyến mãi (bao gồm inactive và expired)")
     public ResponseEntity<ApiResponse<List<PromotionResponse>>> getAllPromotions() {
         List<PromotionResponse> promotions = promotionService.getAllPromotions();
         return ResponseEntity.ok(ApiResponse.success(promotions, "Lấy danh sách khuyến mãi thành công"));
@@ -133,8 +133,8 @@ public class PromotionController {
      * Chỉ Staff và Admin
      */
     @GetMapping("/{id}/usage")
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    @Operation(summary = "Thống kê sử dụng mã giảm giá", description = "**Access:** 👔 Staff/Admin\n\nXem số lần mã khuyến mãi đã được sử dụng")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN', 'MANAGER')")
+    @Operation(summary = "Thống kê sử dụng mã giảm giá", description = "**Access:** 👔 Staff/Admin/Manager\n\nXem số lần mã khuyến mãi đã được sử dụng")
     public ResponseEntity<ApiResponse<PromotionService.PromotionUsageResponse>> getPromotionUsage(@PathVariable Long id) {
         PromotionService.PromotionUsageResponse usage = promotionService.getPromotionUsage(id);
         return ResponseEntity.ok(ApiResponse.success(usage, "Lấy thống kê sử dụng thành công"));
@@ -146,8 +146,8 @@ public class PromotionController {
      * Chỉ Staff và Admin
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    @Operation(summary = "Cập nhật mã giảm giá", description = "**Access:** 👔 Staff/Admin\n\nCập nhật thông tin mã khuyến mãi")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN', 'MANAGER')")
+    @Operation(summary = "Cập nhật mã giảm giá", description = "**Access:** 👔 Staff/Admin/Manager\n\nCập nhật thông tin mã khuyến mãi")
     public ResponseEntity<ApiResponse<PromotionResponse>> updatePromotion(
             @PathVariable Long id,
             @Valid @RequestBody PromotionRequest request) {
@@ -161,8 +161,8 @@ public class PromotionController {
      * Chỉ Staff và Admin
      */
     @PatchMapping("/{id}/activate")
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    @Operation(summary = "Kích hoạt mã giảm giá", description = "**Access:** 👔 Staff/Admin\n\nKích hoạt mã khuyến mãi")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN', 'MANAGER')")
+    @Operation(summary = "Kích hoạt mã giảm giá", description = "**Access:** 👔 Staff/Admin/Manager\n\nKích hoạt mã khuyến mãi")
     public ResponseEntity<ApiResponse<PromotionResponse>> activatePromotion(@PathVariable Long id) {
         PromotionResponse promotion = promotionService.activatePromotion(id);
         return ResponseEntity.ok(ApiResponse.success(promotion, "Kích hoạt khuyến mãi thành công"));
@@ -174,8 +174,8 @@ public class PromotionController {
      * Chỉ Staff và Admin
      */
     @PatchMapping("/{id}/deactivate")
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
-    @Operation(summary = "Vô hiệu hóa mã giảm giá", description = "**Access:** 👔 Staff/Admin\n\nVô hiệu hóa mã khuyến mãi (tạm ngưng sử dụng)")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN', 'MANAGER')")
+    @Operation(summary = "Vô hiệu hóa mã giảm giá", description = "**Access:** 👔 Staff/Admin/Manager\n\nVô hiệu hóa mã khuyến mãi (tạm ngưng sử dụng)")
     public ResponseEntity<ApiResponse<PromotionResponse>> deactivatePromotion(@PathVariable Long id) {
         PromotionResponse promotion = promotionService.deactivatePromotion(id);
         return ResponseEntity.ok(ApiResponse.success(promotion, "Vô hiệu hóa khuyến mãi thành công"));

@@ -48,10 +48,10 @@ public class UserController {
     /**
      * Lấy thông tin user theo email
      * GET /api/users/email/{email}
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/email/{email}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<UserResponse>> getUserByEmail(@PathVariable String email) {
         UserResponse user = userService.getUserByEmail(email);
         return ResponseEntity.ok(ApiResponse.success(user, "Lấy thông tin user thành công"));
@@ -60,10 +60,10 @@ public class UserController {
     /**
      * Lấy danh sách tất cả users
      * GET /api/users
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
         List<UserResponse> users = userService.getAllUsers();
         return ResponseEntity.ok(ApiResponse.success(users, "Lấy danh sách user thành công"));
@@ -84,7 +84,7 @@ public class UserController {
     }
     
     /**
-     * Xóa user
+     * Xóa user (Soft Delete)
      * DELETE /api/users/{id}
      * Chỉ Admin
      */
@@ -169,13 +169,13 @@ public class UserController {
     /**
      * Tìm kiếm users theo nhiều tiêu chí
      * GET /api/users/search
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/search")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Tìm kiếm users theo nhiều tiêu chí",
-        description = "Search với username, email, fullName, roleId. Tất cả parameters đều optional. Chỉ ADMIN và STAFF."
+        description = "Search với username, email, fullName, roleId. Tất cả parameters đều optional. ADMIN, STAFF và MANAGER."
     )
     public ResponseEntity<ApiResponse<List<UserResponse>>> searchUsers(
             @RequestParam(required = false) String username,
@@ -189,13 +189,13 @@ public class UserController {
     /**
      * Lấy users theo role
      * GET /api/users/role/{roleId}
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/role/{roleId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Lấy users theo role",
-        description = "Lấy danh sách users có role cụ thể. Chỉ ADMIN và STAFF."
+        description = "Lấy danh sách users có role cụ thể. ADMIN, STAFF và MANAGER."
     )
     public ResponseEntity<ApiResponse<List<UserResponse>>> getUsersByRole(@PathVariable Long roleId) {
         List<UserResponse> users = userService.getUsersByRole(roleId);
@@ -205,13 +205,13 @@ public class UserController {
     /**
      * Lấy chỉ users đang hoạt động (không bị soft delete)
      * GET /api/users/active
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/active")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Lấy users đang hoạt động",
-        description = "Lấy danh sách users chưa bị xóa (deleted_at IS NULL). Chỉ ADMIN và STAFF."
+        description = "Lấy danh sách users chưa bị xóa (deleted_at IS NULL). ADMIN, STAFF và MANAGER."
     )
     public ResponseEntity<ApiResponse<List<UserResponse>>> getActiveUsers() {
         List<UserResponse> users = userService.getActiveUsers();

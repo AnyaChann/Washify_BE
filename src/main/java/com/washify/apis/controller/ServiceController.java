@@ -28,10 +28,10 @@ public class ServiceController {
     /**
      * Tạo dịch vụ mới
      * POST /api/services
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<ServiceResponse>> createService(@Valid @RequestBody ServiceRequest request) {
         ServiceResponse service = serviceService.createService(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -119,10 +119,10 @@ public class ServiceController {
     /**
      * Cập nhật dịch vụ
      * PUT /api/services/{id}
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<ServiceResponse>> updateService(
             @PathVariable Long id,
             @Valid @RequestBody ServiceRequest request) {
@@ -133,10 +133,10 @@ public class ServiceController {
     /**
      * Xóa dịch vụ
      * DELETE /api/services/{id}
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<Void>> deleteService(@PathVariable Long id) {
         serviceService.deleteService(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa dịch vụ thành công"));

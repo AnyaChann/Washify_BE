@@ -61,10 +61,11 @@ public class BranchController {
     /**
      * Cập nhật chi nhánh
      * PUT /api/branches/{id}
-     * Chỉ Admin
+     * Admin: toàn quyền cập nhật mọi chi nhánh
+     * Manager: chỉ cập nhật chi nhánh mà họ quản lý
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('MANAGER') and @branchSecurity.isBranchManager(#id, authentication))")
     public ResponseEntity<ApiResponse<BranchResponse>> updateBranch(
             @PathVariable Long id,
             @Valid @RequestBody BranchRequest request) {
@@ -91,10 +92,10 @@ public class BranchController {
     /**
      * Lấy thống kê tất cả chi nhánh (so sánh hiệu suất)
      * GET /api/branches/statistics
-     * Admin/Staff
+     * Admin/Staff/Manager
      */
     @GetMapping("/statistics")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<List<BranchService.BranchStatistics>>> getAllBranchStatistics() {
         List<BranchService.BranchStatistics> statistics = branchService.getAllBranchStatistics();
         return ResponseEntity.ok(ApiResponse.success(statistics, "Lấy thống kê chi nhánh thành công"));
@@ -103,10 +104,10 @@ public class BranchController {
     /**
      * Lấy thống kê chi tiết của một chi nhánh
      * GET /api/branches/{id}/statistics
-     * Admin/Staff
+     * Admin/Staff/Manager
      */
     @GetMapping("/{id}/statistics")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<BranchService.BranchDetailStatistics>> getBranchDetailStatistics(@PathVariable Long id) {
         BranchService.BranchDetailStatistics statistics = branchService.getBranchDetailStatistics(id);
         return ResponseEntity.ok(ApiResponse.success(statistics, "Lấy thống kê chi tiết chi nhánh thành công"));

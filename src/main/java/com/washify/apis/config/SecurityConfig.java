@@ -22,12 +22,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * Security Configuration - JWT Authentication
  * 
- * TESTING MODE: Method-level security is DISABLED
- * Uncomment @EnableMethodSecurity to enable role-based access control
+ * Roles: ADMIN, STAFF, MANAGER, SHIPPER, CUSTOMER
+ * Method-level security is ENABLED
  */
 @Configuration
 @EnableWebSecurity
-// @EnableMethodSecurity(prePostEnabled = true) // TEMPORARILY DISABLED FOR TESTING
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 

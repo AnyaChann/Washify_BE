@@ -32,10 +32,10 @@ public class ShipperController {
      * @return ShipperResponse với status 201 Created
      */
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Tạo mới shipper",
-        description = "Tạo tài khoản shipper mới. Yêu cầu quyền ADMIN hoặc STAFF."
+        description = "Tạo tài khoản shipper mới. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
     )
     public ResponseEntity<ShipperResponse> createShipper(@Valid @RequestBody ShipperRequest request) {
         ShipperResponse response = shipperService.createShipper(request);
@@ -43,14 +43,14 @@ public class ShipperController {
     }
 
     /**
-     * Lấy danh sách tất cả shippers
+     * Lấy danh sách tất cả shipper
      * @return Danh sách ShipperResponse
      */
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
-        summary = "Lấy danh sách tất cả shippers",
-        description = "Lấy danh sách tất cả shippers trong hệ thống. Yêu cầu quyền ADMIN hoặc STAFF."
+        summary = "Lấy danh sách shipper",
+        description = "Lấy danh sách tất cả shipper. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
     )
     public ResponseEntity<List<ShipperResponse>> getAllShippers() {
         List<ShipperResponse> shippers = shipperService.getAllShippers();
@@ -62,10 +62,10 @@ public class ShipperController {
      * @return Danh sách ShipperResponse có isActive = true
      */
     @GetMapping("/active")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Lấy danh sách shippers đang hoạt động",
-        description = "Lấy danh sách các shippers đang trong trạng thái hoạt động (isActive = true). Yêu cầu quyền ADMIN hoặc STAFF."
+        description = "Lấy danh sách các shippers đang trong trạng thái hoạt động (isActive = true). Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
     )
     public ResponseEntity<List<ShipperResponse>> getActiveShippers() {
         List<ShipperResponse> shippers = shipperService.getActiveShippers();
@@ -78,10 +78,10 @@ public class ShipperController {
      * @return ShipperResponse
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Lấy thông tin shipper theo ID",
-        description = "Lấy thông tin chi tiết của một shipper. Yêu cầu quyền ADMIN hoặc STAFF."
+        description = "Lấy thông tin chi tiết của một shipper. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
     )
     public ResponseEntity<ShipperResponse> getShipperById(@PathVariable Long id) {
         ShipperResponse response = shipperService.getShipperById(id);
@@ -94,10 +94,10 @@ public class ShipperController {
      * @return Danh sách ShipperResponse phù hợp
      */
     @GetMapping("/phone/{phone}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Tìm shippers theo số điện thoại",
-        description = "Tìm kiếm shippers có số điện thoại chứa từ khóa. Yêu cầu quyền ADMIN hoặc STAFF."
+        description = "Tìm kiếm shippers có số điện thoại chứa từ khóa. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
     )
     public ResponseEntity<List<ShipperResponse>> getShippersByPhone(@PathVariable String phone) {
         List<ShipperResponse> shippers = shipperService.findByPhone(phone);
@@ -110,10 +110,10 @@ public class ShipperController {
      * @return Danh sách ShipperResponse phù hợp
      */
     @GetMapping("/name/{name}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Tìm shippers theo tên",
-        description = "Tìm kiếm shippers có tên chứa từ khóa (không phân biệt chữ hoa/thường). Yêu cầu quyền ADMIN hoặc STAFF."
+        description = "Tìm kiếm shippers có tên chứa từ khóa (không phân biệt chữ hoa/thường). Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
     )
     public ResponseEntity<List<ShipperResponse>> getShippersByName(@PathVariable String name) {
         List<ShipperResponse> shippers = shipperService.findByName(name);
@@ -126,10 +126,10 @@ public class ShipperController {
      * @return ShipperStatistics chứa tổng số shipments, hoàn thành, đang giao
      */
     @GetMapping("/{id}/statistics")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Lấy thống kê shipments của shipper",
-        description = "Lấy thống kê số lượng shipments: tổng số, đã hoàn thành, đang giao hàng. Yêu cầu quyền ADMIN hoặc STAFF."
+        description = "Lấy thống kê số lượng shipments: tổng số, đã hoàn thành, đang giao hàng. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
     )
     public ResponseEntity<ShipperService.ShipperStatistics> getShipperStatistics(@PathVariable Long id) {
         ShipperService.ShipperStatistics statistics = shipperService.getShipperStatistics(id);
@@ -143,10 +143,10 @@ public class ShipperController {
      * @return ShipperResponse đã được cập nhật
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Cập nhật thông tin shipper",
-        description = "Cập nhật thông tin của shipper. Yêu cầu quyền ADMIN hoặc STAFF."
+        description = "Cập nhật thông tin của shipper. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
     )
     public ResponseEntity<ShipperResponse> updateShipper(
             @PathVariable Long id,
@@ -161,10 +161,10 @@ public class ShipperController {
      * @return ShipperResponse đã được kích hoạt
      */
     @PatchMapping("/{id}/activate")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Kích hoạt shipper",
-        description = "Đặt trạng thái shipper thành active (isActive = true). Yêu cầu quyền ADMIN."
+        description = "Đặt trạng thái shipper thành active (isActive = true). Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
     )
     public ResponseEntity<ShipperResponse> activateShipper(@PathVariable Long id) {
         ShipperResponse response = shipperService.activateShipper(id);
@@ -177,10 +177,10 @@ public class ShipperController {
      * @return ShipperResponse đã được vô hiệu hóa
      */
     @PatchMapping("/{id}/deactivate")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Vô hiệu hóa shipper",
-        description = "Đặt trạng thái shipper thành inactive (isActive = false). Yêu cầu quyền ADMIN."
+        description = "Đặt trạng thái shipper thành inactive (isActive = false). Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
     )
     public ResponseEntity<ShipperResponse> deactivateShipper(@PathVariable Long id) {
         ShipperResponse response = shipperService.deactivateShipper(id);

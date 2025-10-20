@@ -79,12 +79,12 @@ public class NotificationController {
     }
 
     /**
-     * Lấy tất cả notifications (Admin/Staff)
+     * Lấy tất cả notifications (Admin/Staff/Manager)
      * GET /api/notifications
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    @Operation(summary = "Lấy tất cả thông báo", description = "Lấy tất cả thông báo trong hệ thống (Admin/Staff only)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
+    @Operation(summary = "Lấy tất cả thông báo", description = "Lấy tất cả thông báo trong hệ thống (Admin/Staff/Manager)")
     public ResponseEntity<ApiResponse<Page<NotificationResponse>>> getAllNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -101,12 +101,12 @@ public class NotificationController {
     }
 
     /**
-     * Lấy notifications của một user cụ thể (Admin/Staff)
+     * Lấy notifications của một user cụ thể (Admin/Staff/Manager)
      * GET /api/notifications/user/{userId}
      */
     @GetMapping("/user/{userId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    @Operation(summary = "Lấy thông báo của user", description = "Lấy thông báo của một user cụ thể (Admin/Staff only)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
+    @Operation(summary = "Lấy thông báo của user", description = "Lấy thông báo của một user cụ thể (Admin/Staff/Manager)")
     public ResponseEntity<ApiResponse<Page<NotificationResponse>>> getUserNotificationsById(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,

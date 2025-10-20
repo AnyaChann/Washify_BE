@@ -79,7 +79,7 @@ public class ShipmentController {
      * Chỉ Admin và Staff
      */
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     public ResponseEntity<ApiResponse<List<ShipmentResponse>>> getShipmentsByStatus(@PathVariable String status) {
         List<ShipmentResponse> shipments = shipmentService.getShipmentsByStatus(status);
         return ResponseEntity.ok(ApiResponse.success(shipments, "Lấy danh sách giao hàng thành công"));
@@ -88,10 +88,10 @@ public class ShipmentController {
     /**
      * Cập nhật trạng thái giao hàng
      * PATCH /api/shipments/{id}/status
-     * Shipper cập nhật đơn của mình, Staff/Admin cập nhật tất cả
+     * Shipper cập nhật đơn của mình, Staff/Admin/Manager cập nhật tất cả
      */
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('SHIPPER', 'STAFF', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SHIPPER', 'STAFF', 'ADMIN', 'MANAGER')")
     public ResponseEntity<ApiResponse<ShipmentResponse>> updateShipmentStatus(
             @PathVariable Long id,
             @RequestParam String status) {
@@ -102,10 +102,10 @@ public class ShipmentController {
     /**
      * Gán shipper cho đơn giao hàng
      * PATCH /api/shipments/{id}/assign-shipper
-     * Chỉ Staff và Admin
+     * Staff, Admin, Manager
      */
     @PatchMapping("/{id}/assign-shipper")
-    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN', 'MANAGER')")
     public ResponseEntity<ApiResponse<ShipmentResponse>> assignShipper(
             @PathVariable Long id,
             @RequestParam Long shipperId) {
@@ -209,13 +209,13 @@ public class ShipmentController {
     /**
      * Lấy overall shipment statistics
      * GET /api/shipments/statistics
-     * Chỉ Admin và Staff
+     * Admin, Staff, Manager
      */
     @GetMapping("/statistics")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @io.swagger.v3.oas.annotations.Operation(
         summary = "Overall shipment statistics",
-        description = "Tổng quan thống kê shipments: counts by status, success rate, average delivery time. Chỉ ADMIN và STAFF."
+        description = "Tổng quan thống kê shipments: counts by status, success rate, average delivery time. ADMIN, STAFF và MANAGER."
     )
     public ResponseEntity<ApiResponse<ShipmentService.ShipmentStatistics>> getShipmentStatistics() {
         ShipmentService.ShipmentStatistics stats = shipmentService.getShipmentStatistics();
