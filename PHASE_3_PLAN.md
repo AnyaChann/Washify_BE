@@ -20,30 +20,47 @@ Phase 3 focuses on:
 
 ## 📋 Planned Features
 
-### Category A: Attachment Management (HIGH Priority)
+### Category A: Attachment Management (HIGH Priority) ✅ COMPLETED
 **Goal:** Complete the stub implementation from Phase 2
 
-#### AttachmentController (NEW - 6 endpoints)
-1. **POST** `/api/attachments` - Upload file (generic)
-2. **GET** `/api/attachments/{id}` - Get attachment info
-3. **GET** `/api/attachments/order/{orderId}` - Get order attachments
-4. **GET** `/api/attachments/shipment/{shipmentId}` - Get shipment attachments
-5. **DELETE** `/api/attachments/{id}` - Delete attachment
-6. **GET** `/api/attachments/{id}/download` - Download file
+#### AttachmentController (NEW - 7 endpoints) ✅ COMPLETED
+1. ✅ **POST** `/api/attachments/upload` - Upload file (MultipartFile)
+   - Supports both orderId and shipmentId (at least one required)
+   - Saves file to local disk (uploads/ directory)
+   - Returns attachment info with file URL
+   - Access: ADMIN/STAFF/CUSTOMER
+2. ✅ **POST** `/api/attachments` - Create attachment from existing URL
+   - For files already uploaded to external storage (S3, CDN)
+   - Validates orderId or shipmentId
+   - Access: ADMIN/STAFF/CUSTOMER
+3. ✅ **GET** `/api/attachments/{id}` - Get attachment info
+   - Returns attachment metadata
+   - Access: ADMIN/STAFF/CUSTOMER
+4. ✅ **GET** `/api/attachments/order/{orderId}` - Get order attachments
+   - Returns list of all attachments for an order
+   - Access: ADMIN/STAFF/CUSTOMER
+5. ✅ **GET** `/api/attachments/shipment/{shipmentId}` - Get shipment attachments
+   - Returns list of all attachments for a shipment
+   - Access: ADMIN/STAFF/CUSTOMER
+6. ✅ **GET** `/api/attachments/{id}/download` - Download file
+   - Returns file as Resource for download
+   - Sets Content-Disposition header
+   - Access: ADMIN/STAFF/CUSTOMER
+7. ✅ **DELETE** `/api/attachments/{id}` - Delete attachment
+   - Deletes both file and database record
+   - Access: ADMIN/STAFF only
 
-**OR** Merge into existing controllers:
-- OrderController: +2 endpoints (upload, list)
-- ShipmentController: Already has stubs, need full implementation
+**Implementation Details:**
+- ✅ Created AttachmentRequest DTO (fileUrl, fileType, orderId, shipmentId)
+- ✅ Created AttachmentResponse DTO (id, orderId, shipmentId, fileUrl, fileType, uploadedAt)
+- ✅ Created AttachmentService with full CRUD operations
+- ✅ Local storage implementation (uploads/ directory)
+- ✅ MultipartFile handling with UUID filename generation
+- ⚠️ Production TODO: Migrate to cloud storage (AWS S3/Azure Blob)
+- ⚠️ Production TODO: Add file validation (size, type, virus scan)
+- ⚠️ Production TODO: Image processing (compression, thumbnails)
 
-**Technical Requirements:**
-- MultipartFile handling
-- File validation (size, type, virus scan)
-- Cloud storage integration (AWS S3 / Azure Blob)
-- Image processing (compression, thumbnails)
-- Signed URLs for secure download
-- CDN integration
-
-**Decision Needed:** Separate controller or merge?
+**Decision:** Separate AttachmentController (not merged)
 
 ---
 

@@ -28,8 +28,9 @@ public class SoftDeleteController {
     
     /**
      * Lấy danh sách users đã bị xóa mềm
+     * Changed to /users (not /users/deleted) for consistency
      */
-    @GetMapping("/users/deleted")
+    @GetMapping("/users")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getDeletedUsers() {
         List<User> users = softDeleteService.getDeletedUsers();
         List<UserResponse> response = users.stream()
@@ -71,7 +72,7 @@ public class SoftDeleteController {
     // BRANCH ENDPOINTS
     // ========================================
     
-    @GetMapping("/branches/deleted")
+    @GetMapping("/branches")
     public ResponseEntity<ApiResponse<List<BranchResponse>>> getDeletedBranches() {
         List<Branch> branches = softDeleteService.getDeletedBranches();
         List<BranchResponse> response = branches.stream()
@@ -107,7 +108,7 @@ public class SoftDeleteController {
     // SERVICE ENDPOINTS
     // ========================================
     
-    @GetMapping("/services/deleted")
+    @GetMapping("/services")
     public ResponseEntity<ApiResponse<List<ServiceResponse>>> getDeletedServices() {
         List<com.washify.apis.entity.Service> services = softDeleteService.getDeletedServices();
         List<ServiceResponse> response = services.stream()
@@ -143,10 +144,17 @@ public class SoftDeleteController {
     // ORDER ENDPOINTS
     // ========================================
     
-    @GetMapping("/orders/deleted")
-    public ResponseEntity<ApiResponse<List<Order>>> getDeletedOrders() {
+    /**
+     * Lấy danh sách orders đã bị xóa mềm  
+     * Changed to /orders (not /orders/deleted) for consistency
+     */
+    @GetMapping("/orders")
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getDeletedOrders() {
         List<Order> orders = softDeleteService.getDeletedOrders();
-        return ResponseEntity.ok(ApiResponse.success(orders, 
+        List<OrderResponse> response = orders.stream()
+                .map(this::mapToOrderResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success(response, 
             "Lấy danh sách orders đã xóa thành công"));
     }
     
@@ -176,7 +184,7 @@ public class SoftDeleteController {
     // PROMOTION ENDPOINTS
     // ========================================
     
-    @GetMapping("/promotions/deleted")
+    @GetMapping("/promotions")
     public ResponseEntity<ApiResponse<List<PromotionResponse>>> getDeletedPromotions() {
         List<Promotion> promotions = softDeleteService.getDeletedPromotions();
         List<PromotionResponse> response = promotions.stream()
@@ -212,7 +220,7 @@ public class SoftDeleteController {
     // SHIPPER ENDPOINTS
     // ========================================
     
-    @GetMapping("/shippers/deleted")
+    @GetMapping("/shippers")
     public ResponseEntity<ApiResponse<List<ShipperResponse>>> getDeletedShippers() {
         List<Shipper> shippers = softDeleteService.getDeletedShippers();
         List<ShipperResponse> response = shippers.stream()
@@ -258,6 +266,20 @@ public class SoftDeleteController {
         response.setCreatedAt(user.getCreatedAt());
         response.setDeletedAt(user.getDeletedAt());
         return response;
+    }
+    
+    private OrderResponse mapToOrderResponse(Order order) {
+        return OrderResponse.builder()
+                .id(order.getId())
+                .userId(order.getUser() != null ? order.getUser().getId() : null)
+                .userName(order.getUser() != null ? order.getUser().getFullName() : null)
+                .branchId(order.getBranch() != null ? order.getBranch().getId() : null)
+                .branchName(order.getBranch() != null ? order.getBranch().getName() : null)
+                .orderDate(order.getOrderDate())
+                .status(order.getStatus() != null ? order.getStatus().name() : null)
+                .totalAmount(order.getTotalAmount())
+                .notes(order.getNotes())
+                .build();
     }
     
     private ServiceResponse mapToServiceResponse(com.washify.apis.entity.Service service) {
