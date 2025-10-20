@@ -21,5 +21,7 @@ public class BranchResponse {
     private String address;
     private String phone;
     private String managerName;
+    private Boolean isActive;
     private LocalDateTime createdAt;
+    private LocalDateTime deletedAt;
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * DTO cho response thông tin dịch vụ
@@ -22,4 +23,5 @@ public class ServiceResponse {
     private BigDecimal price;
     private Integer estimatedTime;
     private Boolean isActive;
+    private LocalDateTime deletedAt;
 }

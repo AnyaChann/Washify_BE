@@ -1,7 +1,6 @@
 package com.washify.apis.controller;
 
-import com.washify.apis.dto.response.ApiResponse;
-import com.washify.apis.dto.response.UserResponse;
+import com.washify.apis.dto.response.*;
 import com.washify.apis.entity.*;
 import com.washify.apis.service.SoftDeleteService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/soft-delete")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class SoftDeleteController {
     
     private final SoftDeleteService softDeleteService;
@@ -73,9 +71,12 @@ public class SoftDeleteController {
     // ========================================
     
     @GetMapping("/branches/deleted")
-    public ResponseEntity<ApiResponse<List<Branch>>> getDeletedBranches() {
+    public ResponseEntity<ApiResponse<List<BranchResponse>>> getDeletedBranches() {
         List<Branch> branches = softDeleteService.getDeletedBranches();
-        return ResponseEntity.ok(ApiResponse.success(branches, 
+        List<BranchResponse> response = branches.stream()
+                .map(this::mapToBranchResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success(response, 
             "Lấy danh sách branches đã xóa thành công"));
     }
     
@@ -106,9 +107,12 @@ public class SoftDeleteController {
     // ========================================
     
     @GetMapping("/services/deleted")
-    public ResponseEntity<ApiResponse<List<com.washify.apis.entity.Service>>> getDeletedServices() {
+    public ResponseEntity<ApiResponse<List<ServiceResponse>>> getDeletedServices() {
         List<com.washify.apis.entity.Service> services = softDeleteService.getDeletedServices();
-        return ResponseEntity.ok(ApiResponse.success(services, 
+        List<ServiceResponse> response = services.stream()
+                .map(this::mapToServiceResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success(response, 
             "Lấy danh sách services đã xóa thành công"));
     }
     
@@ -172,9 +176,12 @@ public class SoftDeleteController {
     // ========================================
     
     @GetMapping("/promotions/deleted")
-    public ResponseEntity<ApiResponse<List<Promotion>>> getDeletedPromotions() {
+    public ResponseEntity<ApiResponse<List<PromotionResponse>>> getDeletedPromotions() {
         List<Promotion> promotions = softDeleteService.getDeletedPromotions();
-        return ResponseEntity.ok(ApiResponse.success(promotions, 
+        List<PromotionResponse> response = promotions.stream()
+                .map(this::mapToPromotionResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success(response, 
             "Lấy danh sách promotions đã xóa thành công"));
     }
     
@@ -205,9 +212,12 @@ public class SoftDeleteController {
     // ========================================
     
     @GetMapping("/shippers/deleted")
-    public ResponseEntity<ApiResponse<List<Shipper>>> getDeletedShippers() {
+    public ResponseEntity<ApiResponse<List<ShipperResponse>>> getDeletedShippers() {
         List<Shipper> shippers = softDeleteService.getDeletedShippers();
-        return ResponseEntity.ok(ApiResponse.success(shippers, 
+        List<ShipperResponse> response = shippers.stream()
+                .map(this::mapToShipperResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success(response, 
             "Lấy danh sách shippers đã xóa thành công"));
     }
     
@@ -245,6 +255,59 @@ public class SoftDeleteController {
         response.setPhone(user.getPhone());
         response.setAddress(user.getAddress());
         response.setCreatedAt(user.getCreatedAt());
+        response.setDeletedAt(user.getDeletedAt());
         return response;
+    }
+    
+    private ServiceResponse mapToServiceResponse(com.washify.apis.entity.Service service) {
+        return ServiceResponse.builder()
+                .id(service.getId())
+                .name(service.getName())
+                .description(service.getDescription())
+                .price(service.getPrice())
+                .estimatedTime(service.getEstimatedTime())
+                .isActive(service.getIsActive())
+                .deletedAt(service.getDeletedAt())
+                .build();
+    }
+    
+    private BranchResponse mapToBranchResponse(Branch branch) {
+        return BranchResponse.builder()
+                .id(branch.getId())
+                .name(branch.getName())
+                .address(branch.getAddress())
+                .phone(branch.getPhone())
+                .managerName(branch.getManagerName())
+                .isActive(branch.getIsActive())
+                .createdAt(branch.getCreatedAt())
+                .deletedAt(branch.getDeletedAt())
+                .build();
+    }
+    
+    private PromotionResponse mapToPromotionResponse(Promotion promotion) {
+        return PromotionResponse.builder()
+                .id(promotion.getId())
+                .code(promotion.getCode())
+                .description(promotion.getDescription())
+                .discountType(promotion.getDiscountType().name())
+                .discountValue(promotion.getDiscountValue())
+                .startDate(promotion.getStartDate())
+                .endDate(promotion.getEndDate())
+                .isActive(promotion.getIsActive())
+                .deletedAt(promotion.getDeletedAt())
+                .build();
+    }
+    
+    private ShipperResponse mapToShipperResponse(Shipper shipper) {
+        return ShipperResponse.builder()
+                .id(shipper.getId())
+                .name(shipper.getName())
+                .phone(shipper.getPhone())
+                .vehicleNumber(shipper.getVehicleNumber())
+                .isActive(shipper.getIsActive())
+                .createdAt(shipper.getCreatedAt())
+                .updatedAt(shipper.getUpdatedAt())
+                .deletedAt(shipper.getDeletedAt())
+                .build();
     }
 }

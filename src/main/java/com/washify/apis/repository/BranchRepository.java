@@ -50,15 +50,21 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     // SOFT DELETE METHODS
     // ========================================
     
-    @Query(value = "SELECT * FROM branches WHERE deleted_at IS NOT NULL", nativeQuery = true)
+    /**
+     * Lấy tất cả branches đã bị soft delete (deleted_at NOT NULL AND is_active = 0)
+     */
+    @Query(value = "SELECT * FROM branches WHERE deleted_at IS NOT NULL AND is_active = 0", nativeQuery = true)
     List<Branch> findAllDeleted();
     
-    @Query(value = "SELECT * FROM branches WHERE id = :id AND deleted_at IS NOT NULL", nativeQuery = true)
+    /**
+     * Tìm branch đã bị soft delete theo ID
+     */
+    @Query(value = "SELECT * FROM branches WHERE id = :id AND deleted_at IS NOT NULL AND is_active = 0", nativeQuery = true)
     Optional<Branch> findDeletedById(@Param("id") Long id);
     
     @Modifying
     @Transactional
-    @Query(value = "UPDATE branches SET deleted_at = NULL WHERE id = :id", nativeQuery = true)
+    @Query(value = "UPDATE branches SET deleted_at = NULL, is_active = 1 WHERE id = :id", nativeQuery = true)
     int restoreById(@Param("id") Long id);
     
     @Modifying

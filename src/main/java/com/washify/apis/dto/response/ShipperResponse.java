@@ -15,15 +15,11 @@ import lombok.NoArgsConstructor;
 public class ShipperResponse {
 
     private Long id;
-    private String fullName;
-    private String phoneNumber;
-    private String email;
-    private String vehicleType;
-    private String vehicleNumber;
-    private String address;
+    private String name; // Match với Shipper.name
+    private String phone; // Match với Shipper.phone
+    private String vehicleNumber; // Match với Shipper.vehicleNumber
     private Boolean isActive;
-    private Integer totalDeliveries;
-    private Integer completedDeliveries;
     private java.time.LocalDateTime createdAt;
     private java.time.LocalDateTime updatedAt;
+    private java.time.LocalDateTime deletedAt;
 }

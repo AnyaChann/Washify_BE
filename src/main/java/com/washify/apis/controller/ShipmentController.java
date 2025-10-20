@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/shipments")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ShipmentController {
     
     private final ShipmentService shipmentService;

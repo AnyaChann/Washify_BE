@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/branches")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class BranchController {
     
     private final BranchService branchService;

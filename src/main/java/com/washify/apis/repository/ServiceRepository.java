@@ -44,15 +44,21 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     // SOFT DELETE METHODS
     // ========================================
     
-    @Query(value = "SELECT * FROM services WHERE deleted_at IS NOT NULL", nativeQuery = true)
+    /**
+     * Lấy tất cả services đã bị soft delete (deleted_at NOT NULL AND is_active = 0)
+     */
+    @Query(value = "SELECT * FROM services WHERE deleted_at IS NOT NULL AND is_active = 0", nativeQuery = true)
     List<Service> findAllDeleted();
     
-    @Query(value = "SELECT * FROM services WHERE id = :id AND deleted_at IS NOT NULL", nativeQuery = true)
+    /**
+     * Tìm service đã bị soft delete theo ID
+     */
+    @Query(value = "SELECT * FROM services WHERE id = :id AND deleted_at IS NOT NULL AND is_active = 0", nativeQuery = true)
     Optional<Service> findDeletedById(@Param("id") Long id);
     
     @Modifying
     @Transactional
-    @Query(value = "UPDATE services SET deleted_at = NULL WHERE id = :id", nativeQuery = true)
+    @Query(value = "UPDATE services SET deleted_at = NULL, is_active = 1 WHERE id = :id", nativeQuery = true)
     int restoreById(@Param("id") Long id);
     
     @Modifying

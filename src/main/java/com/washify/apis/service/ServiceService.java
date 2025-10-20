@@ -113,6 +113,7 @@ public class ServiceService {
                 .price(service.getPrice())
                 .estimatedTime(service.getEstimatedTime())
                 .isActive(service.getIsActive())
+                .deletedAt(service.getDeletedAt())
                 .build();
     }
 }

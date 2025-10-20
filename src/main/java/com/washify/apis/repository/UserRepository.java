@@ -59,15 +59,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // ========================================
     
     /**
-     * Lấy tất cả users đã bị xóa mềm
+     * Lấy tất cả users đã bị xóa mềm (deleted_at NOT NULL AND is_active = 0)
      */
-    @Query(value = "SELECT * FROM users WHERE deleted_at IS NOT NULL", nativeQuery = true)
+    @Query(value = "SELECT * FROM users WHERE deleted_at IS NOT NULL AND is_active = 0", nativeQuery = true)
     List<User> findAllDeleted();
     
     /**
-     * Tìm user đã bị xóa theo ID
+     * Tìm user đã bị xóa theo ID (deleted_at NOT NULL AND is_active = 0)
      */
-    @Query(value = "SELECT * FROM users WHERE id = :id AND deleted_at IS NOT NULL", nativeQuery = true)
+    @Query(value = "SELECT * FROM users WHERE id = :id AND deleted_at IS NOT NULL AND is_active = 0", nativeQuery = true)
     Optional<User> findDeletedById(@Param("id") Long id);
     
     /**
@@ -75,7 +75,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Modifying
     @Transactional
-    @Query(value = "UPDATE users SET deleted_at = NULL WHERE id = :id", nativeQuery = true)
+    @Query(value = "UPDATE users SET deleted_at = NULL, is_active = 1 WHERE id = :id", nativeQuery = true)
     int restoreById(@Param("id") Long id);
     
     /**

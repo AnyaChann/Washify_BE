@@ -51,15 +51,21 @@ public interface ShipperRepository extends JpaRepository<Shipper, Long> {
     // SOFT DELETE METHODS
     // ========================================
     
-    @Query(value = "SELECT * FROM shippers WHERE deleted_at IS NOT NULL", nativeQuery = true)
+    /**
+     * Lấy tất cả shippers đã bị soft delete (deleted_at NOT NULL AND is_active = 0)
+     */
+    @Query(value = "SELECT * FROM shippers WHERE deleted_at IS NOT NULL AND is_active = 0", nativeQuery = true)
     List<Shipper> findAllDeleted();
     
-    @Query(value = "SELECT * FROM shippers WHERE id = :id AND deleted_at IS NOT NULL", nativeQuery = true)
+    /**
+     * Tìm shipper đã bị soft delete theo ID
+     */
+    @Query(value = "SELECT * FROM shippers WHERE id = :id AND deleted_at IS NOT NULL AND is_active = 0", nativeQuery = true)
     Optional<Shipper> findDeletedById(@Param("id") Long id);
     
     @Modifying
     @Transactional
-    @Query(value = "UPDATE shippers SET deleted_at = NULL WHERE id = :id", nativeQuery = true)
+    @Query(value = "UPDATE shippers SET deleted_at = NULL, is_active = 1 WHERE id = :id", nativeQuery = true)
     int restoreById(@Param("id") Long id);
     
     @Modifying

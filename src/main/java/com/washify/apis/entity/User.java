@@ -23,7 +23,7 @@ import java.util.Set;
 @Data // Lombok: tự động tạo getters, setters, toString, equals, hashCode
 @NoArgsConstructor // Constructor không tham số
 @AllArgsConstructor // Constructor đầy đủ tham số
-@SQLDelete(sql = "UPDATE users SET deleted_at = NOW() WHERE id = ?") // Soft delete
+@SQLDelete(sql = "UPDATE users SET deleted_at = NOW(), is_active = 0 WHERE id = ?") // Soft delete: set deleted_at và inactive
 @Where(clause = "deleted_at IS NULL") // Chỉ query các record chưa bị xóa
 public class User {
     

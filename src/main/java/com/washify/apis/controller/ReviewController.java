@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ReviewController {
     
     private final ReviewService reviewService;

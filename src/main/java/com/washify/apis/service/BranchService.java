@@ -91,7 +91,9 @@ public class BranchService {
                 .address(branch.getAddress())
                 .phone(branch.getPhone())
                 .managerName(branch.getManagerName())
+                .isActive(branch.getIsActive())
                 .createdAt(branch.getCreatedAt())
+                .deletedAt(branch.getDeletedAt())
                 .build();
     }
 }

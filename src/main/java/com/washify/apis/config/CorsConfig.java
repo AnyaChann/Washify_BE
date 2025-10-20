@@ -6,6 +6,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * CORS Configuration - Cấu hình cho phép frontend gọi API
+ * 
+ * TESTING MODE: Cho phép tất cả origins
+ * Production: Chỉ định cụ thể origins
  */
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
@@ -13,14 +16,16 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins(
-                        "http://localhost:3000",
-                        "http://localhost:4200",
-                        "http://localhost:5173",
-                        "http://127.0.0.1:3000",
-                        "http://127.0.0.1:4200",
-                        "http://127.0.0.1:5173"
-                )
+                // TESTING: Cho phép tất cả origins
+                .allowedOriginPatterns("*")
+                
+                // PRODUCTION: Uncomment và chỉ định origins cụ thể
+                // .allowedOrigins(
+                //         "http://localhost:3000",
+                //         "http://localhost:4200",
+                //         "http://localhost:5173",
+                //         "https://your-production-domain.com"
+                // )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)

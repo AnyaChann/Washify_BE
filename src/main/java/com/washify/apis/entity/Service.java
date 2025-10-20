@@ -23,7 +23,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE services SET deleted_at = NOW() WHERE id = ?") // Soft delete
+@SQLDelete(sql = "UPDATE services SET deleted_at = NOW(), is_active = 0 WHERE id = ?") // Soft delete: set deleted_at và inactive
 @Where(clause = "deleted_at IS NULL") // Chỉ query các record chưa bị xóa
 public class Service {
     
