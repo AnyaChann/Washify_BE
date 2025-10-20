@@ -116,4 +116,45 @@ public class ServiceService {
                 .deletedAt(service.getDeletedAt())
                 .build();
     }
+    
+    // ========================================
+    // PHASE 3: ADVANCED SEARCH METHODS
+    // ========================================
+    
+    /**
+     * Tìm kiếm dịch vụ theo nhiều tiêu chí
+     */
+    @Transactional(readOnly = true)
+    public List<ServiceResponse> advancedSearch(String name, Double minPrice, Double maxPrice, Boolean isActive) {
+        // Validate price range
+        if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+            throw new RuntimeException("Giá tối thiểu không thể lớn hơn giá tối đa");
+        }
+        
+        List<com.washify.apis.entity.Service> services = serviceRepository.advancedSearch(
+            name, minPrice, maxPrice, isActive
+        );
+        
+        return services.stream()
+                .map(this::mapToServiceResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Lấy dịch vụ theo khoảng giá
+     */
+    @Transactional(readOnly = true)
+    public List<ServiceResponse> getServicesByPriceRange(Double minPrice, Double maxPrice) {
+        if (minPrice < 0 || maxPrice < 0) {
+            throw new RuntimeException("Giá không thể âm");
+        }
+        if (minPrice > maxPrice) {
+            throw new RuntimeException("Giá tối thiểu không thể lớn hơn giá tối đa");
+        }
+        
+        List<com.washify.apis.entity.Service> services = serviceRepository.findByPriceRange(minPrice, maxPrice);
+        return services.stream()
+                .map(this::mapToServiceResponse)
+                .collect(Collectors.toList());
+    }
 }

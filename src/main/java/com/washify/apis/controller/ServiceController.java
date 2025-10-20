@@ -78,6 +78,44 @@ public class ServiceController {
         return ResponseEntity.ok(ApiResponse.success(services, "Tìm kiếm dịch vụ thành công"));
     }
     
+    // ========================================
+    // PHASE 3: ADVANCED SEARCH & FILTERING
+    // ========================================
+    
+    /**
+     * Tìm kiếm dịch vụ theo nhiều tiêu chí
+     * GET /api/services/advanced-search
+     */
+    @GetMapping("/advanced-search")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Tìm kiếm dịch vụ theo nhiều tiêu chí",
+        description = "Search với name, minPrice, maxPrice, isActive. Tất cả parameters đều optional."
+    )
+    public ResponseEntity<ApiResponse<List<ServiceResponse>>> advancedSearch(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) Boolean isActive) {
+        List<ServiceResponse> services = serviceService.advancedSearch(name, minPrice, maxPrice, isActive);
+        return ResponseEntity.ok(ApiResponse.success(services, "Tìm kiếm dịch vụ thành công"));
+    }
+    
+    /**
+     * Lấy dịch vụ theo khoảng giá
+     * GET /api/services/price-range
+     */
+    @GetMapping("/price-range")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Dịch vụ theo khoảng giá",
+        description = "Lấy các dịch vụ trong khoảng giá từ minPrice đến maxPrice."
+    )
+    public ResponseEntity<ApiResponse<List<ServiceResponse>>> getServicesByPriceRange(
+            @RequestParam Double minPrice,
+            @RequestParam Double maxPrice) {
+        List<ServiceResponse> services = serviceService.getServicesByPriceRange(minPrice, maxPrice);
+        return ResponseEntity.ok(ApiResponse.success(services, "Lấy danh sách dịch vụ thành công"));
+    }
+    
     /**
      * Cập nhật dịch vụ
      * PUT /api/services/{id}

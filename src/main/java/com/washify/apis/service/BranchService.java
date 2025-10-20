@@ -96,4 +96,127 @@ public class BranchService {
                 .deletedAt(branch.getDeletedAt())
                 .build();
     }
+    
+    // ========================================
+    // ENHANCEMENTS - Phase 3: Statistics & Analytics
+    // ========================================
+    
+    /**
+     * Lấy thống kê tất cả chi nhánh (so sánh hiệu suất giữa các chi nhánh)
+     */
+    @Transactional(readOnly = true)
+    public List<BranchStatistics> getAllBranchStatistics() {
+        List<Branch> branches = branchRepository.findAll();
+        
+        return branches.stream()
+                .map(branch -> {
+                    Long totalOrders = branchRepository.countOrdersByBranchId(branch.getId());
+                    Long completedOrders = branchRepository.countCompletedOrdersByBranchId(branch.getId());
+                    Double totalRevenue = branchRepository.sumRevenueByBranchId(branch.getId());
+                    
+                    // Tính tỷ lệ hoàn thành
+                    double completionRate = 0.0;
+                    if (totalOrders > 0) {
+                        completionRate = (completedOrders * 100.0) / totalOrders;
+                    }
+                    
+                    return new BranchStatistics(
+                            branch.getId(),
+                            branch.getName(),
+                            totalOrders,
+                            completedOrders,
+                            totalRevenue != null ? totalRevenue : 0.0,
+                            completionRate
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Lấy thống kê chi tiết của một chi nhánh
+     */
+    @Transactional(readOnly = true)
+    public BranchDetailStatistics getBranchDetailStatistics(Long branchId) {
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy chi nhánh với ID: " + branchId));
+        
+        Long totalOrders = branchRepository.countOrdersByBranchId(branchId);
+        Long completedOrders = branchRepository.countCompletedOrdersByBranchId(branchId);
+        Double totalRevenue = branchRepository.sumRevenueByBranchId(branchId);
+        Double averageOrderValue = branchRepository.getAverageOrderValueByBranchId(branchId);
+        
+        // Tính tỷ lệ hoàn thành
+        double completionRate = 0.0;
+        if (totalOrders > 0) {
+            completionRate = (completedOrders * 100.0) / totalOrders;
+        }
+        
+        return new BranchDetailStatistics(
+                branch.getId(),
+                branch.getName(),
+                branch.getAddress(),
+                branch.getManagerName(),
+                totalOrders,
+                completedOrders,
+                totalRevenue != null ? totalRevenue : 0.0,
+                averageOrderValue != null ? averageOrderValue : 0.0,
+                completionRate,
+                branch.getIsActive()
+        );
+    }
+    
+    /**
+     * Inner class chứa thống kê tổng quan của chi nhánh (để so sánh)
+     */
+    public static class BranchStatistics {
+        public final Long branchId;
+        public final String branchName;
+        public final Long totalOrders;
+        public final Long completedOrders;
+        public final Double totalRevenue;
+        public final Double completionRate; // Tỷ lệ hoàn thành (%)
+        
+        public BranchStatistics(Long branchId, String branchName, Long totalOrders,
+                                Long completedOrders, Double totalRevenue, Double completionRate) {
+            this.branchId = branchId;
+            this.branchName = branchName;
+            this.totalOrders = totalOrders;
+            this.completedOrders = completedOrders;
+            this.totalRevenue = totalRevenue;
+            this.completionRate = completionRate;
+        }
+    }
+    
+    /**
+     * Inner class chứa thống kê chi tiết của một chi nhánh
+     */
+    public static class BranchDetailStatistics {
+        public final Long branchId;
+        public final String branchName;
+        public final String address;
+        public final String managerName;
+        public final Long totalOrders;
+        public final Long completedOrders;
+        public final Double totalRevenue;
+        public final Double averageOrderValue;
+        public final Double completionRate; // Tỷ lệ hoàn thành (%)
+        public final Boolean isActive;
+        
+        public BranchDetailStatistics(Long branchId, String branchName, String address,
+                                      String managerName, Long totalOrders, Long completedOrders,
+                                      Double totalRevenue, Double averageOrderValue,
+                                      Double completionRate, Boolean isActive) {
+            this.branchId = branchId;
+            this.branchName = branchName;
+            this.address = address;
+            this.managerName = managerName;
+            this.totalOrders = totalOrders;
+            this.completedOrders = completedOrders;
+            this.totalRevenue = totalRevenue;
+            this.averageOrderValue = averageOrderValue;
+            this.completionRate = completionRate;
+            this.isActive = isActive;
+        }
+    }
 }
+

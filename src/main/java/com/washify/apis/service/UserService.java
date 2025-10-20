@@ -190,4 +190,51 @@ public class UserService {
                         .collect(Collectors.toSet()))
                 .build();
     }
+    
+    // ========================================
+    // PHASE 3: ADVANCED SEARCH METHODS
+    // ========================================
+    
+    /**
+     * Tìm kiếm users theo nhiều tiêu chí
+     */
+    @Transactional(readOnly = true)
+    public List<UserResponse> searchUsers(String username, String email, String fullName, Long roleId) {
+        // Validate roleId if provided
+        if (roleId != null) {
+            roleRepository.findById(roleId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy role với ID: " + roleId));
+        }
+        
+        List<User> users = userRepository.searchUsers(username, email, fullName, roleId);
+        return users.stream()
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Lấy users theo role
+     */
+    @Transactional(readOnly = true)
+    public List<UserResponse> getUsersByRole(Long roleId) {
+        // Validate role exists
+        roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy role với ID: " + roleId));
+        
+        List<User> users = userRepository.findByRoleId(roleId);
+        return users.stream()
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Lấy chỉ users đang hoạt động
+     */
+    @Transactional(readOnly = true)
+    public List<UserResponse> getActiveUsers() {
+        List<User> users = userRepository.findAllActive();
+        return users.stream()
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
+    }
 }

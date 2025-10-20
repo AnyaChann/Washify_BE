@@ -165,12 +165,36 @@ public class OrderService {
                 .status(order.getStatus().name())
                 .totalAmount(order.getTotalAmount())
                 .notes(order.getNotes())
-                .items(order.getOrderItems().stream()
-                        .map(this::mapToOrderItemResponse)
-                        .collect(Collectors.toList()))
-                .promotionCodes(order.getPromotions().stream()
-                        .map(Promotion::getCode)
-                        .collect(Collectors.toList()))
+                .items(order.getOrderItems() != null ? 
+                        order.getOrderItems().stream()
+                            .map(this::mapToOrderItemResponse)
+                            .collect(Collectors.toList()) : 
+                        new java.util.ArrayList<>())
+                .promotionCodes(order.getPromotions() != null ? 
+                        order.getPromotions().stream()
+                            .map(Promotion::getCode)
+                            .collect(Collectors.toList()) : 
+                        new java.util.ArrayList<>())
+                .build();
+    }
+    
+    /**
+     * Map Entity sang DTO Response (Simple - no lazy collections)
+     * Used for search/list operations to avoid StackOverflowError
+     */
+    private OrderResponse mapToOrderResponseSimple(Order order) {
+        return OrderResponse.builder()
+                .id(order.getId())
+                .userId(order.getUser().getId())
+                .userName(order.getUser().getFullName())
+                .branchId(order.getBranch() != null ? order.getBranch().getId() : null)
+                .branchName(order.getBranch() != null ? order.getBranch().getName() : null)
+                .orderDate(order.getOrderDate())
+                .status(order.getStatus().name())
+                .totalAmount(order.getTotalAmount())
+                .notes(order.getNotes())
+                .items(new java.util.ArrayList<>())  // Empty list - avoid lazy loading
+                .promotionCodes(new java.util.ArrayList<>())  // Empty list - avoid lazy loading
                 .build();
     }
     
@@ -296,5 +320,223 @@ public class OrderService {
         }
         
         order.setTotalAmount(totalAmount);
+    }
+    
+    // ========================================
+    // PHASE 3: STATISTICS & ANALYTICS
+    // ========================================
+    
+    /**
+     * Lấy thống kê tổng quan về orders
+     */
+    @Transactional(readOnly = true)
+    public OrderStatistics getOrderStatistics() {
+        long totalOrders = orderRepository.count();
+        long pendingOrders = orderRepository.countByStatus(Order.OrderStatus.PENDING);
+        long inProgressOrders = orderRepository.countByStatus(Order.OrderStatus.IN_PROGRESS);
+        long completedOrders = orderRepository.countByStatus(Order.OrderStatus.COMPLETED);
+        long cancelledOrders = orderRepository.countByStatus(Order.OrderStatus.CANCELLED);
+        
+        Double totalRevenue = orderRepository.sumTotalAmountByStatus(Order.OrderStatus.COMPLETED);
+        Double averageOrderValue = orderRepository.getAverageOrderValue();
+        
+        return new OrderStatistics(
+            totalOrders,
+            pendingOrders,
+            inProgressOrders,
+            completedOrders,
+            cancelledOrders,
+            totalRevenue != null ? totalRevenue : 0.0,
+            averageOrderValue != null ? averageOrderValue : 0.0
+        );
+    }
+    
+    /**
+     * Lấy thống kê doanh thu theo khoảng thời gian
+     */
+    @Transactional(readOnly = true)
+    public RevenueStatistics getRevenueStatistics(java.time.LocalDateTime startDate, java.time.LocalDateTime endDate) {
+        Double totalRevenue = orderRepository.sumTotalAmountByDateRange(startDate, endDate);
+        List<Order> orders = orderRepository.findByOrderDateBetween(startDate, endDate);
+        
+        long orderCount = orders.stream()
+                .filter(o -> o.getStatus() != Order.OrderStatus.CANCELLED)
+                .count();
+        
+        double averageOrderValue = orderCount > 0 ? (totalRevenue != null ? totalRevenue : 0.0) / orderCount : 0.0;
+        
+        return new RevenueStatistics(
+            totalRevenue != null ? totalRevenue : 0.0,
+            orderCount,
+            averageOrderValue,
+            startDate,
+            endDate
+        );
+    }
+    
+    /**
+     * Lấy danh sách top customers
+     */
+    @Transactional(readOnly = true)
+    public List<TopCustomer> getTopCustomers(int limit) {
+        List<Object[]> results = orderRepository.findTopCustomersByOrderCount(limit);
+        
+        return results.stream().map(row -> {
+            Long userId = ((Number) row[0]).longValue();
+            Long orderCount = ((Number) row[1]).longValue();
+            
+            User user = userRepository.findById(userId).orElse(null);
+            String username = user != null ? user.getUsername() : "Unknown";
+            String fullName = user != null ? user.getFullName() : "Unknown";
+            
+            // Get total value for this customer
+            Double totalValue = orderRepository.findByUserId(userId).stream()
+                    .filter(o -> o.getStatus() != Order.OrderStatus.CANCELLED)
+                    .map(Order::getTotalAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .doubleValue();
+            
+            return new TopCustomer(userId, username, fullName, orderCount, totalValue);
+        }).collect(Collectors.toList());
+    }
+    
+    /**
+     * Inner class cho Order Statistics
+     */
+    public static class OrderStatistics {
+        public final long totalOrders;
+        public final long pendingOrders;
+        public final long inProgressOrders;
+        public final long completedOrders;
+        public final long cancelledOrders;
+        public final double totalRevenue;
+        public final double averageOrderValue;
+        
+        public OrderStatistics(long totalOrders, long pendingOrders, long inProgressOrders,
+                             long completedOrders, long cancelledOrders,
+                             double totalRevenue, double averageOrderValue) {
+            this.totalOrders = totalOrders;
+            this.pendingOrders = pendingOrders;
+            this.inProgressOrders = inProgressOrders;
+            this.completedOrders = completedOrders;
+            this.cancelledOrders = cancelledOrders;
+            this.totalRevenue = totalRevenue;
+            this.averageOrderValue = averageOrderValue;
+        }
+    }
+    
+    /**
+     * Inner class cho Revenue Statistics
+     */
+    public static class RevenueStatistics {
+        public final double totalRevenue;
+        public final long orderCount;
+        public final double averageOrderValue;
+        public final java.time.LocalDateTime startDate;
+        public final java.time.LocalDateTime endDate;
+        
+        public RevenueStatistics(double totalRevenue, long orderCount, double averageOrderValue,
+                                java.time.LocalDateTime startDate, java.time.LocalDateTime endDate) {
+            this.totalRevenue = totalRevenue;
+            this.orderCount = orderCount;
+            this.averageOrderValue = averageOrderValue;
+            this.startDate = startDate;
+            this.endDate = endDate;
+        }
+    }
+    
+    /**
+     * Inner class cho Top Customer
+     */
+    public static class TopCustomer {
+        public final Long userId;
+        public final String username;
+        public final String fullName;
+        public final Long orderCount;
+        public final Double totalValue;
+        
+        public TopCustomer(Long userId, String username, String fullName, Long orderCount, Double totalValue) {
+            this.userId = userId;
+            this.username = username;
+            this.fullName = fullName;
+            this.orderCount = orderCount;
+            this.totalValue = totalValue;
+        }
+    }
+    
+    // ========================================
+    // PHASE 3: ADVANCED SEARCH METHODS
+    // ========================================
+    
+    /**
+     * Tìm kiếm orders theo nhiều tiêu chí
+     */
+    public List<OrderResponse> searchOrders(Long userId, Long branchId, String status, 
+                                           java.time.LocalDateTime dateFrom, java.time.LocalDateTime dateTo,
+                                           Double minAmount, Double maxAmount) {
+        // Convert string status to enum
+        Order.OrderStatus orderStatus = null;
+        if (status != null && !status.isEmpty()) {
+            try {
+                orderStatus = Order.OrderStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Trạng thái không hợp lệ: " + status);
+            }
+        }
+        
+        List<Order> orders = orderRepository.searchOrders(
+            userId, branchId, orderStatus, dateFrom, dateTo, minAmount, maxAmount
+        );
+        
+        // Map to response without accessing lazy-loaded collections
+        return orders.stream()
+                .map(this::mapToOrderResponseSimple)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Lấy orders của user theo status
+     */
+    public List<OrderResponse> getOrdersByUserAndStatus(Long userId, String status) {
+        Order.OrderStatus orderStatus;
+        try {
+            orderStatus = Order.OrderStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Trạng thái không hợp lệ: " + status);
+        }
+        
+        List<Order> orders = orderRepository.findByUserIdAndStatus(userId, orderStatus);
+        return orders.stream()
+                .map(this::mapToOrderResponseSimple)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Lấy orders theo branch
+     */
+    public List<OrderResponse> getOrdersByBranch(Long branchId) {
+        // Validate branch exists
+        branchRepository.findById(branchId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy chi nhánh với ID: " + branchId));
+        
+        List<Order> orders = orderRepository.findByBranchId(branchId);
+        return orders.stream()
+                .map(this::mapToOrderResponseSimple)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Lấy orders theo khoảng thời gian
+     */
+    public List<OrderResponse> getOrdersByDateRange(java.time.LocalDateTime startDate, 
+                                                    java.time.LocalDateTime endDate) {
+        if (startDate.isAfter(endDate)) {
+            throw new RuntimeException("Ngày bắt đầu phải trước ngày kết thúc");
+        }
+        
+        List<Order> orders = orderRepository.findByOrderDateBetween(startDate, endDate);
+        return orders.stream()
+                .map(this::mapToOrderResponseSimple)
+                .collect(Collectors.toList());
     }
 }

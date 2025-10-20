@@ -97,4 +97,29 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query(value = "SELECT * FROM users WHERE email = :email", nativeQuery = true)
     Optional<User> findByEmailIncludingDeleted(@Param("email") String email);
+    
+    // ========================================
+    // PHASE 3: ADVANCED SEARCH QUERIES
+    // ========================================
+    
+    /**
+     * Tìm kiếm users theo nhiều tiêu chí với JOIN roles
+     */
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN u.roles r WHERE " +
+           "(:username IS NULL OR LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%'))) AND " +
+           "(:email IS NULL OR LOWER(u.email) LIKE LOWER(CONCAT('%', :email, '%'))) AND " +
+           "(:fullName IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :fullName, '%'))) AND " +
+           "(:roleId IS NULL OR r.id = :roleId)")
+    List<User> searchUsers(
+        @Param("username") String username,
+        @Param("email") String email,
+        @Param("fullName") String fullName,
+        @Param("roleId") Long roleId
+    );
+    
+    /**
+     * Lấy users theo role (JOIN với roles Set)
+     */
+    @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r.id = :roleId")
+    List<User> findByRoleId(@Param("roleId") Long roleId);
 }

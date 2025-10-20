@@ -88,4 +88,26 @@ public interface ShipmentRepository extends JpaRepository<Shipment, Long> {
      * @return Số lượng shipments
      */
     long countByShipperIdAndDeliveryStatusIn(Long shipperId, List<Shipment.DeliveryStatus> deliveryStatuses);
+    
+    // ========================================
+    // PHASE 3: STATISTICS QUERIES
+    // ========================================
+    
+    /**
+     * Đếm tổng số shipments (all statuses)
+     */
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(s) FROM Shipment s")
+    long countAllShipments();
+    
+    /**
+     * Tính thời gian giao hàng trung bình (tính từ lúc đặt hàng đến khi giao xong)
+     * Chỉ tính cho các shipment đã DELIVERED
+     * Sử dụng Order.orderDate làm thời điểm bắt đầu vì Shipment không có pickupDate
+     */
+    @org.springframework.data.jpa.repository.Query(
+        "SELECT AVG(TIMESTAMPDIFF(HOUR, s.order.orderDate, s.deliveryDate)) " +
+        "FROM Shipment s " +
+        "WHERE s.deliveryStatus = 'DELIVERED' AND s.order.orderDate IS NOT NULL AND s.deliveryDate IS NOT NULL"
+    )
+    Double getAverageDeliveryTimeInHours();
 }

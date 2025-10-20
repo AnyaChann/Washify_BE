@@ -201,4 +201,24 @@ public class ShipmentController {
         
         return ResponseEntity.ok(ApiResponse.success(message, "Endpoint sẵn sàng cho implementation"));
     }
+    
+    // ========================================
+    // PHASE 3: STATISTICS & ANALYTICS
+    // ========================================
+    
+    /**
+     * Lấy overall shipment statistics
+     * GET /api/shipments/statistics
+     * Chỉ Admin và Staff
+     */
+    @GetMapping("/statistics")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Overall shipment statistics",
+        description = "Tổng quan thống kê shipments: counts by status, success rate, average delivery time. Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<ShipmentService.ShipmentStatistics>> getShipmentStatistics() {
+        ShipmentService.ShipmentStatistics stats = shipmentService.getShipmentStatistics();
+        return ResponseEntity.ok(ApiResponse.success(stats, "Lấy thống kê shipments thành công"));
+    }
 }

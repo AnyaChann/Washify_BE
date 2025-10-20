@@ -47,6 +47,34 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
     List<Branch> findAllActive();
     
     // ========================================
+    // PHASE 3: STATISTICS QUERIES
+    // ========================================
+    
+    /**
+     * Đếm số lượng orders theo branch ID
+     */
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.branch.id = :branchId AND o.deletedAt IS NULL")
+    Long countOrdersByBranchId(@Param("branchId") Long branchId);
+    
+    /**
+     * Tính tổng doanh thu theo branch ID
+     */
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.branch.id = :branchId AND o.deletedAt IS NULL")
+    Double sumRevenueByBranchId(@Param("branchId") Long branchId);
+    
+    /**
+     * Đếm orders hoàn thành theo branch ID
+     */
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.branch.id = :branchId AND o.status = 'COMPLETED' AND o.deletedAt IS NULL")
+    Long countCompletedOrdersByBranchId(@Param("branchId") Long branchId);
+    
+    /**
+     * Tính giá trị đơn hàng trung bình theo branch ID
+     */
+    @Query("SELECT AVG(o.totalAmount) FROM Order o WHERE o.branch.id = :branchId AND o.deletedAt IS NULL")
+    Double getAverageOrderValueByBranchId(@Param("branchId") Long branchId);
+    
+    // ========================================
     // SOFT DELETE METHODS
     // ========================================
     

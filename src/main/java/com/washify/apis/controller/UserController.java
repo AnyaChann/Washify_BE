@@ -161,5 +161,61 @@ public class UserController {
         
         return ResponseEntity.ok(ApiResponse.success(message));
     }
+    
+    // ========================================
+    // PHASE 3: ADVANCED SEARCH & FILTERING
+    // ========================================
+    
+    /**
+     * Tìm kiếm users theo nhiều tiêu chí
+     * GET /api/users/search
+     * Chỉ Admin và Staff
+     */
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @Operation(
+        summary = "Tìm kiếm users theo nhiều tiêu chí",
+        description = "Search với username, email, fullName, roleId. Tất cả parameters đều optional. Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<List<UserResponse>>> searchUsers(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String fullName,
+            @RequestParam(required = false) Long roleId) {
+        List<UserResponse> users = userService.searchUsers(username, email, fullName, roleId);
+        return ResponseEntity.ok(ApiResponse.success(users, "Tìm kiếm users thành công"));
+    }
+    
+    /**
+     * Lấy users theo role
+     * GET /api/users/role/{roleId}
+     * Chỉ Admin và Staff
+     */
+    @GetMapping("/role/{roleId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @Operation(
+        summary = "Lấy users theo role",
+        description = "Lấy danh sách users có role cụ thể. Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsersByRole(@PathVariable Long roleId) {
+        List<UserResponse> users = userService.getUsersByRole(roleId);
+        return ResponseEntity.ok(ApiResponse.success(users, "Lấy danh sách users thành công"));
+    }
+    
+    /**
+     * Lấy chỉ users đang hoạt động (không bị soft delete)
+     * GET /api/users/active
+     * Chỉ Admin và Staff
+     */
+    @GetMapping("/active")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @Operation(
+        summary = "Lấy users đang hoạt động",
+        description = "Lấy danh sách users chưa bị xóa (deleted_at IS NULL). Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getActiveUsers() {
+        List<UserResponse> users = userService.getActiveUsers();
+        return ResponseEntity.ok(ApiResponse.success(users, "Lấy danh sách users hoạt động thành công"));
+    }
 }
 

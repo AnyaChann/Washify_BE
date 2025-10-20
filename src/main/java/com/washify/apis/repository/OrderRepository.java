@@ -81,6 +81,73 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     long countByStatus(Order.OrderStatus status);
     
     // ========================================
+    // PHASE 3: STATISTICS QUERIES
+    // ========================================
+    
+    /**
+     * Tính trung bình giá trị đơn hàng
+     * @return Giá trị trung bình
+     */
+    @Query("SELECT AVG(o.totalAmount) FROM Order o WHERE o.status != 'CANCELLED'")
+    Double getAverageOrderValue();
+    
+    /**
+     * Tìm top customers theo số lượng orders
+     * @param limit Số lượng top customers
+     * @return List of [userId, orderCount]
+     */
+    @Query(value = "SELECT user_id, COUNT(*) as order_count FROM orders WHERE status != 'CANCELLED' GROUP BY user_id ORDER BY order_count DESC LIMIT :limit", nativeQuery = true)
+    List<Object[]> findTopCustomersByOrderCount(@Param("limit") int limit);
+    
+    /**
+     * Tìm top customers theo tổng giá trị orders
+     * @param limit Số lượng top customers
+     * @return List of [userId, totalAmount]
+     */
+    @Query(value = "SELECT user_id, SUM(total_amount) as total_value FROM orders WHERE status != 'CANCELLED' GROUP BY user_id ORDER BY total_value DESC LIMIT :limit", nativeQuery = true)
+    List<Object[]> findTopCustomersByTotalValue(@Param("limit") int limit);
+    
+    /**
+     * Tính tổng doanh thu trong khoảng thời gian
+     * @param startDate Ngày bắt đầu
+     * @param endDate Ngày kết thúc
+     * @return Tổng doanh thu
+     */
+    @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.orderDate BETWEEN :startDate AND :endDate AND o.status != 'CANCELLED'")
+    Double sumTotalAmountByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    
+    // ========================================
+    // PHASE 3: ADVANCED SEARCH QUERIES
+    // ========================================
+    
+    /**
+     * Tìm kiếm orders theo nhiều tiêu chí (dynamic query)
+     * Sử dụng JPQL với optional parameters
+     * LEFT JOIN FETCH để tránh N+1 query problem
+     * Note: Không fetch orderItems/promotions để tránh MultipleBagFetchException
+     */
+    @Query("SELECT DISTINCT o FROM Order o " +
+           "LEFT JOIN FETCH o.user " +
+           "LEFT JOIN FETCH o.branch " +
+           "WHERE " +
+           "(:userId IS NULL OR o.user.id = :userId) AND " +
+           "(:branchId IS NULL OR o.branch.id = :branchId) AND " +
+           "(:status IS NULL OR o.status = :status) AND " +
+           "(:dateFrom IS NULL OR o.orderDate >= :dateFrom) AND " +
+           "(:dateTo IS NULL OR o.orderDate <= :dateTo) AND " +
+           "(:minAmount IS NULL OR o.totalAmount >= :minAmount) AND " +
+           "(:maxAmount IS NULL OR o.totalAmount <= :maxAmount)")
+    List<Order> searchOrders(
+        @Param("userId") Long userId,
+        @Param("branchId") Long branchId,
+        @Param("status") Order.OrderStatus status,
+        @Param("dateFrom") LocalDateTime dateFrom,
+        @Param("dateTo") LocalDateTime dateTo,
+        @Param("minAmount") Double minAmount,
+        @Param("maxAmount") Double maxAmount
+    );
+    
+    // ========================================
     // SOFT DELETE METHODS
     // ========================================
     

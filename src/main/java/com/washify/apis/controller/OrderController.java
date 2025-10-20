@@ -142,4 +142,140 @@ public class OrderController {
         OrderResponse order = orderService.removePromotion(id, code);
         return ResponseEntity.ok(ApiResponse.success(order, "Xóa mã khuyến mãi thành công"));
     }
+    
+    // ========================================
+    // PHASE 3: STATISTICS & ANALYTICS
+    // ========================================
+    
+    /**
+     * Lấy thống kê tổng quan về orders
+     * GET /api/orders/statistics
+     * Chỉ Admin và Staff
+     */
+    @GetMapping("/statistics")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Lấy thống kê orders",
+        description = "Thống kê tổng quan: tổng số orders, theo status, doanh thu, giá trị trung bình. Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<OrderService.OrderStatistics>> getOrderStatistics() {
+        OrderService.OrderStatistics stats = orderService.getOrderStatistics();
+        return ResponseEntity.ok(ApiResponse.success(stats, "Lấy thống kê orders thành công"));
+    }
+    
+    /**
+     * Lấy thống kê doanh thu theo khoảng thời gian
+     * GET /api/orders/statistics/revenue
+     * Chỉ Admin và Staff
+     */
+    @GetMapping("/statistics/revenue")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Thống kê doanh thu theo thời gian",
+        description = "Doanh thu, số lượng orders, giá trị TB trong khoảng thời gian. Format: yyyy-MM-dd'T'HH:mm:ss. Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<OrderService.RevenueStatistics>> getRevenueStatistics(
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) 
+            java.time.LocalDateTime startDate,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) 
+            java.time.LocalDateTime endDate) {
+        OrderService.RevenueStatistics stats = orderService.getRevenueStatistics(startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success(stats, "Lấy thống kê doanh thu thành công"));
+    }
+    
+    /**
+     * Lấy danh sách top customers
+     * GET /api/orders/statistics/top-customers
+     * Chỉ Admin và Staff
+     */
+    @GetMapping("/statistics/top-customers")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Top customers theo số lượng orders",
+        description = "Danh sách top customers với số lượng orders và tổng giá trị. Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<List<OrderService.TopCustomer>>> getTopCustomers(
+            @RequestParam(defaultValue = "10") int limit) {
+        List<OrderService.TopCustomer> topCustomers = orderService.getTopCustomers(limit);
+        return ResponseEntity.ok(ApiResponse.success(topCustomers, "Lấy top customers thành công"));
+    }
+    
+    // ========================================
+    // PHASE 3: ADVANCED SEARCH & FILTERING
+    // ========================================
+    
+    /**
+     * Tìm kiếm orders theo nhiều tiêu chí
+     * GET /api/orders/search
+     * Chỉ Admin và Staff
+     */
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Tìm kiếm orders theo nhiều tiêu chí",
+        description = "Search với userId, branchId, status, dateFrom, dateTo, minAmount, maxAmount. Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> searchOrders(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long branchId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime dateFrom,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime dateTo,
+            @RequestParam(required = false) Double minAmount,
+            @RequestParam(required = false) Double maxAmount) {
+        List<OrderResponse> orders = orderService.searchOrders(userId, branchId, status, dateFrom, dateTo, minAmount, maxAmount);
+        return ResponseEntity.ok(ApiResponse.success(orders, "Tìm kiếm orders thành công"));
+    }
+    
+    /**
+     * Lấy orders của user theo status
+     * GET /api/orders/user/{userId}/status/{status}
+     * Admin/Staff xem tất cả, User xem của mình
+     */
+    @GetMapping("/user/{userId}/status/{status}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF') or #userId == authentication.principal.id")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Orders của user theo status",
+        description = "Lấy orders của một user cụ thể theo trạng thái."
+    )
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByUserAndStatus(
+            @PathVariable Long userId,
+            @PathVariable String status) {
+        List<OrderResponse> orders = orderService.getOrdersByUserAndStatus(userId, status);
+        return ResponseEntity.ok(ApiResponse.success(orders, "Lấy danh sách orders thành công"));
+    }
+    
+    /**
+     * Lấy orders theo branch
+     * GET /api/orders/branch/{branchId}
+     * Chỉ Admin và Staff
+     */
+    @GetMapping("/branch/{branchId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Orders theo chi nhánh",
+        description = "Lấy tất cả orders của một chi nhánh. Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByBranch(@PathVariable Long branchId) {
+        List<OrderResponse> orders = orderService.getOrdersByBranch(branchId);
+        return ResponseEntity.ok(ApiResponse.success(orders, "Lấy danh sách orders thành công"));
+    }
+    
+    /**
+     * Lấy orders theo khoảng thời gian
+     * GET /api/orders/date-range
+     * Chỉ Admin và Staff
+     */
+    @GetMapping("/date-range")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "Orders theo khoảng thời gian",
+        description = "Lấy orders trong khoảng thời gian. Format: yyyy-MM-dd'T'HH:mm:ss. Chỉ ADMIN và STAFF."
+    )
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersByDateRange(
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime startDate,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime endDate) {
+        List<OrderResponse> orders = orderService.getOrdersByDateRange(startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success(orders, "Lấy danh sách orders thành công"));
+    }
 }

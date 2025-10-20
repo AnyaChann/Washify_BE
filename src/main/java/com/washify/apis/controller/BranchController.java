@@ -83,4 +83,33 @@ public class BranchController {
         branchService.deleteBranch(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa chi nhánh thành công"));
     }
+    
+    // ========================================
+    // ENHANCEMENTS - Phase 3: Statistics & Analytics
+    // ========================================
+    
+    /**
+     * Lấy thống kê tất cả chi nhánh (so sánh hiệu suất)
+     * GET /api/branches/statistics
+     * Admin/Staff
+     */
+    @GetMapping("/statistics")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<ApiResponse<List<BranchService.BranchStatistics>>> getAllBranchStatistics() {
+        List<BranchService.BranchStatistics> statistics = branchService.getAllBranchStatistics();
+        return ResponseEntity.ok(ApiResponse.success(statistics, "Lấy thống kê chi nhánh thành công"));
+    }
+    
+    /**
+     * Lấy thống kê chi tiết của một chi nhánh
+     * GET /api/branches/{id}/statistics
+     * Admin/Staff
+     */
+    @GetMapping("/{id}/statistics")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<ApiResponse<BranchService.BranchDetailStatistics>> getBranchDetailStatistics(@PathVariable Long id) {
+        BranchService.BranchDetailStatistics statistics = branchService.getBranchDetailStatistics(id);
+        return ResponseEntity.ok(ApiResponse.success(statistics, "Lấy thống kê chi tiết chi nhánh thành công"));
+    }
 }
+

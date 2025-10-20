@@ -41,6 +41,31 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
     List<Service> findByIsActiveOrderByPriceAsc(Boolean isActive);
     
     // ========================================
+    // PHASE 3: ADVANCED SEARCH QUERIES
+    // ========================================
+    
+    /**
+     * Tìm kiếm services theo nhiều tiêu chí (dynamic query)
+     */
+    @Query("SELECT s FROM Service s WHERE " +
+           "(:name IS NULL OR LOWER(s.name) LIKE LOWER(CONCAT('%', :name, '%'))) AND " +
+           "(:minPrice IS NULL OR s.price >= :minPrice) AND " +
+           "(:maxPrice IS NULL OR s.price <= :maxPrice) AND " +
+           "(:isActive IS NULL OR s.isActive = :isActive)")
+    List<Service> advancedSearch(
+        @Param("name") String name,
+        @Param("minPrice") Double minPrice,
+        @Param("maxPrice") Double maxPrice,
+        @Param("isActive") Boolean isActive
+    );
+    
+    /**
+     * Tìm services theo khoảng giá
+     */
+    @Query("SELECT s FROM Service s WHERE s.price >= :minPrice AND s.price <= :maxPrice ORDER BY s.price ASC")
+    List<Service> findByPriceRange(@Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice);
+    
+    // ========================================
     // SOFT DELETE METHODS
     // ========================================
     

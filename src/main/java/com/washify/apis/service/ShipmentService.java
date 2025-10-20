@@ -165,6 +165,69 @@ public class ShipmentService {
     }
     
     // ========================================
+    // ENHANCEMENTS - Phase 3: Statistics & Analytics
+    // ========================================
+    
+    /**
+     * Lấy thống kê tổng quan về shipments
+     */
+    @Transactional(readOnly = true)
+    public ShipmentStatistics getShipmentStatistics() {
+        Long totalShipments = shipmentRepository.countAllShipments();
+        Long pendingCount = shipmentRepository.countByDeliveryStatus(Shipment.DeliveryStatus.PENDING);
+        Long inTransitCount = shipmentRepository.countByDeliveryStatus(Shipment.DeliveryStatus.SHIPPING);
+        Long deliveredCount = shipmentRepository.countByDeliveryStatus(Shipment.DeliveryStatus.DELIVERED);
+        Long cancelledCount = shipmentRepository.countByDeliveryStatus(Shipment.DeliveryStatus.CANCELLED);
+        
+        // Tính tỷ lệ giao hàng thành công (delivered / (total - cancelled))
+        double successRate = 0.0;
+        if (totalShipments > 0 && cancelledCount < totalShipments) {
+            successRate = (deliveredCount * 100.0) / (totalShipments - cancelledCount);
+        }
+        
+        // Lấy thời gian giao hàng trung bình
+        Double averageDeliveryTimeHours = shipmentRepository.getAverageDeliveryTimeInHours();
+        if (averageDeliveryTimeHours == null) {
+            averageDeliveryTimeHours = 0.0;
+        }
+        
+        return new ShipmentStatistics(
+                totalShipments,
+                pendingCount,
+                inTransitCount,
+                deliveredCount,
+                cancelledCount,
+                successRate,
+                averageDeliveryTimeHours
+        );
+    }
+    
+    /**
+     * Inner class chứa thống kê shipment
+     */
+    public static class ShipmentStatistics {
+        public final Long totalShipments;
+        public final Long pendingCount;
+        public final Long inTransitCount;
+        public final Long deliveredCount;
+        public final Long cancelledCount;
+        public final Double successRate; // Phần trăm giao hàng thành công
+        public final Double averageDeliveryTimeHours; // Thời gian giao hàng trung bình (giờ)
+        
+        public ShipmentStatistics(Long totalShipments, Long pendingCount, Long inTransitCount,
+                                  Long deliveredCount, Long cancelledCount, Double successRate,
+                                  Double averageDeliveryTimeHours) {
+            this.totalShipments = totalShipments;
+            this.pendingCount = pendingCount;
+            this.inTransitCount = inTransitCount;
+            this.deliveredCount = deliveredCount;
+            this.cancelledCount = cancelledCount;
+            this.successRate = successRate;
+            this.averageDeliveryTimeHours = averageDeliveryTimeHours;
+        }
+    }
+    
+    // ========================================
     // ENHANCEMENTS - Phase 2: Attachment Management
     // ========================================
     // Note: File upload implementation is simplified
