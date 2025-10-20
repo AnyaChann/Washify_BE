@@ -19,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/payments")
 @RequiredArgsConstructor
+@io.swagger.v3.oas.annotations.tags.Tag(name = "💳 Payments", description = "Quản lý thanh toán - 👤 Customer/Staff/Admin")
 public class PaymentController {
     
     private final PaymentService paymentService;

@@ -19,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
+@io.swagger.v3.oas.annotations.tags.Tag(name = "📦 Orders", description = "Quản lý đơn hàng - 👤 Customer/Staff/Admin")
 public class OrderController {
     
     private final OrderService orderService;

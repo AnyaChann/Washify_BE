@@ -19,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
+@io.swagger.v3.oas.annotations.tags.Tag(name = "⭐ Reviews", description = "Đánh giá dịch vụ - ⭐ Customer/Admin")
 public class ReviewController {
     
     private final ReviewService reviewService;

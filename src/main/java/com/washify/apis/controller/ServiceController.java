@@ -4,6 +4,7 @@ import com.washify.apis.dto.request.ServiceRequest;
 import com.washify.apis.dto.response.ApiResponse;
 import com.washify.apis.dto.response.ServiceResponse;
 import com.washify.apis.service.ServiceService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/services")
 @RequiredArgsConstructor
+@Tag(name = "Services", description = "Quản lý dịch vụ giặt ủi - 👔 Staff/Admin")
 public class ServiceController {
     
     private final ServiceService serviceService;

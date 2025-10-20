@@ -9,6 +9,8 @@ import com.washify.apis.entity.User;
 import com.washify.apis.service.PasswordChange2FAService;
 import com.washify.apis.service.PasswordChangeService;
 import com.washify.apis.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Tag(name = "Users", description = "Quản lý user, profile, roles")
 public class UserController {
     
     private final UserService userService;

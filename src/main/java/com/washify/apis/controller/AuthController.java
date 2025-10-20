@@ -39,7 +39,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication", description = "API cho đăng nhập và đăng ký")
+@Tag(name = "🔐 Authentication", description = "API cho đăng nhập và đăng ký")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -53,7 +53,24 @@ public class AuthController {
      * Đăng nhập
      */
     @PostMapping("/login")
-    @Operation(summary = "Đăng nhập", description = "Đăng nhập với username và password")
+    @Operation(
+        summary = "🌐 Đăng nhập", 
+        description = """
+            **Access:** 🌐 Public - Không cần authentication
+            
+            Đăng nhập với username và password để lấy JWT token.
+            
+            **Flow:**
+            1. Gửi username + password
+            2. Server xác thực
+            3. Trả về JWT token + user info
+            4. Sử dụng token cho các API khác
+            
+            **Response:**
+            - Token: JWT token (valid 24h)
+            - User info: id, username, email, roles
+            """
+    )
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
         log.info("Login attempt for user: {}", loginRequest.getUsername());
 
@@ -98,7 +115,29 @@ public class AuthController {
      * Đăng ký tài khoản mới
      */
     @PostMapping("/register")
-    @Operation(summary = "Đăng ký", description = "Đăng ký tài khoản khách hàng mới")
+    @Operation(
+        summary = "🌐 Đăng ký tài khoản mới", 
+        description = """
+            **Access:** 🌐 Public - Không cần authentication
+            
+            Đăng ký tài khoản khách hàng mới (role: CUSTOMER).
+            
+            **Email Verification:**
+            - Format check (RFC 5322)
+            - Disposable email check (block tempmail, guerrillamail, etc.)
+            - MX record check (verify domain tồn tại)
+            
+            **Validations:**
+            - Username: 3-20 ký tự, chỉ chữ cái, số, dấu chấm, gạch
+            - Password: Tối thiểu 8 ký tự
+            - Email: Format hợp lệ, không phải email tạm thời
+            - Phone: Format Việt Nam (0901234567)
+            
+            **Response:**
+            - JWT token tự động (đăng nhập luôn)
+            - User info với role CUSTOMER
+            """
+    )
     public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest registerRequest) {
         log.info("Register attempt for user: {}", registerRequest.getUsername());
 
@@ -202,7 +241,26 @@ public class AuthController {
      * Validate token
      */
     @GetMapping("/validate")
-    @Operation(summary = "Validate token", description = "Kiểm tra token có hợp lệ không")
+    @Operation(
+        summary = "🌐 Kiểm tra token hợp lệ", 
+        description = """
+            **Access:** 🌐 Public - Không cần authentication
+            
+            Validate JWT token có còn hợp lệ không.
+            
+            **Use Cases:**
+            - Frontend check token trước khi gọi API
+            - Verify token sau khi nhận từ external source
+            - Auto logout nếu token expired
+            
+            **Header:**
+            - Authorization: Bearer {token}
+            
+            **Response:**
+            - true: Token hợp lệ
+            - false: Token expired hoặc invalid
+            """
+    )
     public ResponseEntity<ApiResponse<Boolean>> validateToken(@RequestHeader("Authorization") String authHeader) {
         try {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {

@@ -22,7 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth/email")
 @RequiredArgsConstructor
-@Tag(name = "Email Verification", description = "API kiểm tra email hợp lệ")
+@Tag(name = "Email Verification", description = "Xác thực email hợp lệ, check format, MX records")
 public class EmailVerificationController {
 
     private final EmailVerificationService emailVerificationService;
@@ -33,7 +33,35 @@ public class EmailVerificationController {
      * Public endpoint
      */
     @GetMapping("/check")
-    @Operation(summary = "Kiểm tra email nhanh", description = "Check format và disposable email")
+    @Operation(
+        summary = "🌐 Quick check email", 
+        description = """
+            **Access:** 🌐 Public - Không cần authentication
+            
+            Kiểm tra nhanh email format và disposable email.
+            
+            **Checks:**
+            - ✅ Format validation (RFC 5322)
+            - ✅ Disposable email check (tempmail, guerrillamail, etc.)
+            
+            **Speed:** < 1ms (very fast)
+            
+            **Use Case:**
+            - Frontend real-time validation
+            - Check email trước khi đăng ký
+            - Block disposable emails
+            
+            **Response:**
+            ```json
+            {
+              "email": "test@gmail.com",
+              "validFormat": true,
+              "isDisposable": false,
+              "isValid": true
+            }
+            ```
+            """
+    )
     public ResponseEntity<ApiResponse<Map<String, Object>>> quickCheck(@RequestParam String email) {
         log.info("Quick email check for: {}", email);
         
@@ -65,7 +93,44 @@ public class EmailVerificationController {
      * Public endpoint
      */
     @GetMapping("/verify")
-    @Operation(summary = "Xác thực email đầy đủ", description = "Check format, disposable, và MX records")
+    @Operation(
+        summary = "🌐 Full email verification", 
+        description = """
+            **Access:** 🌐 Public - Không cần authentication
+            
+            Xác thực email đầy đủ: Format + Disposable + MX records.
+            
+            **3 Levels Check:**
+            1. ✅ Format validation (RFC 5322)
+            2. ✅ Disposable email check (block tempmail)
+            3. ✅ MX records check (domain có thể nhận email)
+            
+            **Speed:** 50-200ms (DNS query)
+            
+            **Use Case:**
+            - Verify email trước khi register
+            - Ensure email có thể nhận mail
+            - Block fake domains
+            
+            **Examples:**
+            - ✅ test@gmail.com → Valid (has MX records)
+            - ❌ test@tempmail.com → Invalid (disposable)
+            - ❌ test@fakefake123.com → Invalid (no MX records)
+            
+            **Response:**
+            ```json
+            {
+              "email": "test@gmail.com",
+              "validFormat": true,
+              "isDisposable": false,
+              "hasMXRecords": true,
+              "mxRecords": ["gmail-smtp-in.l.google.com"],
+              "isValid": true,
+              "reason": "Email hợp lệ và có thể nhận email"
+            }
+            ```
+            """
+    )
     public ResponseEntity<ApiResponse<Map<String, Object>>> fullVerify(@RequestParam String email) {
         log.info("Full email verification for: {}", email);
         

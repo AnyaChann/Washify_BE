@@ -4,6 +4,7 @@ import com.washify.apis.dto.request.BranchRequest;
 import com.washify.apis.dto.response.ApiResponse;
 import com.washify.apis.dto.response.BranchResponse;
 import com.washify.apis.service.BranchService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/branches")
 @RequiredArgsConstructor
+@Tag(name = "Branches", description = "Quản lý chi nhánh - 🔒 Admin only")
 public class BranchController {
     
     private final BranchService branchService;

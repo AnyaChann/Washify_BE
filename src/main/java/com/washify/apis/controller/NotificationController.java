@@ -31,7 +31,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/notifications")
 @RequiredArgsConstructor
-@Tag(name = "Notifications", description = "API quản lý thông báo")
+@Tag(name = "🔔 Notifications", description = "Quản lý thông báo, đánh dấu đã đọc")
 @SecurityRequirement(name = "bearerAuth")
 public class NotificationController {
 
