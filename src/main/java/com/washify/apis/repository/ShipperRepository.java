@@ -27,6 +27,12 @@ public interface ShipperRepository extends JpaRepository<Shipper, Long> {
     List<Shipper> findByIsActive(Boolean isActive);
     
     /**
+     * Tìm tất cả shippers đang hoạt động (isActive = true)
+     * @return Danh sách shippers active
+     */
+    List<Shipper> findByIsActiveTrue();
+    
+    /**
      * Tìm shipper theo tên
      * @param name Tên shipper
      * @return Optional chứa Shipper nếu tìm thấy
@@ -34,11 +40,25 @@ public interface ShipperRepository extends JpaRepository<Shipper, Long> {
     Optional<Shipper> findByName(String name);
     
     /**
+     * Tìm shippers theo tên (tìm kiếm gần đúng, không phân biệt chữ hoa/thường)
+     * @param name Tên cần tìm
+     * @return Danh sách shippers
+     */
+    List<Shipper> findByNameContainingIgnoreCase(String name);
+    
+    /**
      * Tìm shipper theo số điện thoại
      * @param phone Số điện thoại
      * @return Optional chứa Shipper nếu tìm thấy
      */
     Optional<Shipper> findByPhone(String phone);
+    
+    /**
+     * Tìm shipper theo số điện thoại (tìm kiếm gần đúng)
+     * @param phone Số điện thoại cần tìm
+     * @return Optional chứa Shipper nếu tìm thấy
+     */
+    Optional<Shipper> findByPhoneContaining(String phone);
     
     /**
      * Tìm shipper theo biển số xe

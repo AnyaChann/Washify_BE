@@ -35,6 +35,12 @@ public interface PromotionRepository extends JpaRepository<Promotion, Long> {
     List<Promotion> findByIsActive(Boolean isActive);
     
     /**
+     * Tìm promotions đang active (isActive = true)
+     * @return Danh sách promotions active
+     */
+    List<Promotion> findByIsActiveTrue();
+    
+    /**
      * Tìm promotions theo loại giảm giá
      * @param discountType Loại giảm giá (PERCENT/FIXED)
      * @return Danh sách promotions

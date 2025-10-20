@@ -65,4 +65,27 @@ public interface ShipmentRepository extends JpaRepository<Shipment, Long> {
      * @return Số lượng shipments
      */
     long countByDeliveryStatus(Shipment.DeliveryStatus deliveryStatus);
+    
+    /**
+     * Đếm số shipments của shipper
+     * @param shipperId ID của shipper
+     * @return Số lượng shipments
+     */
+    long countByShipperId(Long shipperId);
+    
+    /**
+     * Đếm số shipments của shipper theo trạng thái
+     * @param shipperId ID của shipper
+     * @param deliveryStatus Trạng thái giao hàng
+     * @return Số lượng shipments
+     */
+    long countByShipperIdAndDeliveryStatus(Long shipperId, Shipment.DeliveryStatus deliveryStatus);
+    
+    /**
+     * Đếm số shipments của shipper có trạng thái nằm trong danh sách
+     * @param shipperId ID của shipper
+     * @param deliveryStatuses Danh sách trạng thái giao hàng
+     * @return Số lượng shipments
+     */
+    long countByShipperIdAndDeliveryStatusIn(Long shipperId, List<Shipment.DeliveryStatus> deliveryStatuses);
 }

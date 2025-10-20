@@ -31,6 +31,13 @@ public interface UserRoleRepository extends JpaRepository<UserRole, UserRole.Use
     List<UserRole> findByRoleId(Long roleId);
     
     /**
+     * Đếm số user có role cụ thể
+     * @param roleId ID của role
+     * @return Số lượng user có role này
+     */
+    long countByRoleId(Long roleId);
+    
+    /**
      * Kiểm tra xem user có role cụ thể không
      * @param userId ID của user
      * @param roleId ID của role
