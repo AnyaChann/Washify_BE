@@ -1,5 +1,6 @@
 package com.washify.apis.service;
 
+import com.washify.apis.annotation.Audited;
 import com.washify.apis.dto.request.PromotionRequest;
 import com.washify.apis.dto.response.PromotionResponse;
 import com.washify.apis.entity.Order;
@@ -29,6 +30,7 @@ public class PromotionService {
     /**
      * Tạo promotion mới
      */
+    @Audited(action = "CREATE_PROMOTION", entityType = "Promotion", description = "Tạo mã khuyến mãi mới")
     public PromotionResponse createPromotion(PromotionRequest request) {
         // Kiểm tra mã code đã tồn tại chưa
         if (promotionRepository.existsByCode(request.getCode())) {
@@ -102,6 +104,7 @@ public class PromotionService {
     /**
      * Cập nhật promotion
      */
+    @Audited(action = "UPDATE_PROMOTION", entityType = "Promotion", description = "Cập nhật thông tin khuyến mãi")
     public PromotionResponse updatePromotion(Long id, PromotionRequest request) {
         Promotion promotion = promotionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khuyến mãi với ID: " + id));
@@ -128,6 +131,7 @@ public class PromotionService {
     /**
      * Xóa promotion (soft delete)
      */
+    @Audited(action = "DELETE_PROMOTION", entityType = "Promotion", description = "Xóa mềm khuyến mãi")
     public void deletePromotion(Long id) {
         Promotion promotion = promotionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khuyến mãi với ID: " + id));
@@ -137,6 +141,7 @@ public class PromotionService {
     /**
      * Kích hoạt promotion
      */
+    @Audited(action = "ACTIVATE_PROMOTION", entityType = "Promotion", description = "Kích hoạt khuyến mãi")
     public PromotionResponse activatePromotion(Long id) {
         Promotion promotion = promotionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khuyến mãi với ID: " + id));
@@ -149,6 +154,7 @@ public class PromotionService {
     /**
      * Vô hiệu hóa promotion
      */
+    @Audited(action = "DEACTIVATE_PROMOTION", entityType = "Promotion", description = "Vô hiệu hóa khuyến mãi")
     public PromotionResponse deactivatePromotion(Long id) {
         Promotion promotion = promotionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khuyến mãi với ID: " + id));

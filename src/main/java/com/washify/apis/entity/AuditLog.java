@@ -43,6 +43,21 @@ public class AuditLog {
     @Column(name = "new_value", columnDefinition = "TEXT")
     private String newValue; // Giá trị mới (dạng JSON)
     
+    @Column(name = "ip_address", length = 45)
+    private String ipAddress; // IP address của client (IPv4 hoặc IPv6)
+    
+    @Column(name = "user_agent", columnDefinition = "TEXT")
+    private String userAgent; // Browser/device information
+    
+    @Column(columnDefinition = "TEXT")
+    private String description; // Mô tả chi tiết hành động
+    
+    @Column(length = 20)
+    private String status = "SUCCESS"; // SUCCESS hoặc FAILED
+    
+    @Column(name = "error_message", columnDefinition = "TEXT")
+    private String errorMessage; // Thông báo lỗi nếu có
+    
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt; // Thời gian thực hiện

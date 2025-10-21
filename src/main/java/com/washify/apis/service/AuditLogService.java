@@ -121,7 +121,11 @@ public class AuditLogService {
                 .entityType(auditLog.getEntityType())
                 .entityId(auditLog.getEntityId())
                 .username(auditLog.getUser() != null ? auditLog.getUser().getUsername() : "SYSTEM")
-                .ipAddress(null) // Entity không có field này, có thể thêm sau
+                .ipAddress(auditLog.getIpAddress())
+                .userAgent(auditLog.getUserAgent())
+                .description(auditLog.getDescription())
+                .status(auditLog.getStatus())
+                .errorMessage(auditLog.getErrorMessage())
                 .details(buildDetails(auditLog))
                 .timestamp(auditLog.getCreatedAt())
                 .build();

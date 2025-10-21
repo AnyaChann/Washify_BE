@@ -54,15 +54,22 @@
 ```
 
 #### POST `/api/auth/login`
-**Đăng nhập**
+**Đăng nhập (hỗ trợ Username/Email/Phone)**
 - **Public**: ✅ Không cần authentication
 - **Request Body**:
 ```json
 {
-  "email": "customer@example.com",
+  "username": "customer@example.com",
   "password": "Password123"
 }
 ```
+- **Note**: 
+  - Field `username` có thể là:
+    - **Username**: `admin`, `manager1`
+    - **Email**: `customer@example.com`
+    - **Phone**: `0901234567`, `+84901234567`
+  - Hệ thống tự động tìm kiếm theo thứ tự: Username → Email → Phone
+
 - **Response** (200 OK):
 ```json
 {
@@ -76,11 +83,58 @@
       "email": "customer@example.com",
       "fullName": "Nguyễn Văn A",
       "roles": ["CUSTOMER"]
-    }
+    },
+    "requirePasswordChange": false
   },
   "timestamp": "2025-10-21T10:30:00"
 }
 ```
+
+- **Response khi Guest User đăng nhập lần đầu**:
+```json
+{
+  "success": true,
+  "message": "Đăng nhập thành công",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "type": "Bearer",
+    "user": {
+      "id": 10,
+      "username": "guest_0912345678",
+      "phone": "0912345678",
+      "fullName": "Guest User",
+      "roles": ["GUEST"]
+    },
+    "requirePasswordChange": true
+  },
+  "timestamp": "2025-10-21T10:30:00"
+}
+```
+
+#### POST `/api/auth/first-time-password-change`
+**Đổi mật khẩu lần đầu (cho Guest User)**
+- **Auth**: ✅ GUEST (User có `requirePasswordChange = true`)
+- **Request Body**:
+```json
+{
+  "newPassword": "MyNewPassword123",
+  "confirmPassword": "MyNewPassword123"
+}
+```
+- **Response** (200 OK):
+```json
+{
+  "success": true,
+  "message": "Đổi mật khẩu thành công",
+  "data": "Mật khẩu đã được cập nhật. Vui lòng đăng nhập lại với mật khẩu mới.",
+  "timestamp": "2025-10-21T10:30:00"
+}
+```
+- **Note**: 
+  - Endpoint này KHÔNG yêu cầu mật khẩu cũ
+  - Chỉ áp dụng cho user có `requirePasswordChange = true`
+  - Sau khi đổi mật khẩu, `requirePasswordChange` sẽ tự động set về `false`
+  - User cần đăng nhập lại với mật khẩu mới
 
 #### GET `/api/users/{id}`
 **Lấy thông tin cá nhân**
@@ -1435,12 +1489,27 @@ Recommend creating collections for each role:
 ```
 1. POST /api/auth/register (Register)
 2. POST /api/auth/login (Login → Get token)
+   - Có thể dùng username, email hoặc phone để login
 3. GET /api/services (View services)
 4. GET /api/promotions/active (Check promotions)
 5. POST /api/orders (Create order)
 6. GET /api/orders/{id} (Check order status)
 7. POST /api/payments (Make payment)
 8. POST /api/reviews (Leave review)
+```
+
+### Guest User Flow:
+```
+1. Walk-in tại cửa hàng → Staff tạo Guest User
+2. POST /api/auth/login (Login với phone và password mặc định)
+   - username: số điện thoại (VD: 0912345678)
+   - password: Guest@123456
+3. Nhận response với requirePasswordChange = true
+4. POST /api/auth/first-time-password-change (Đổi mật khẩu ngay)
+   - newPassword: mật khẩu mới
+   - confirmPassword: xác nhận mật khẩu
+5. POST /api/auth/login (Login lại với mật khẩu mới)
+6. Sử dụng app như Customer bình thường
 ```
 
 ### Staff Flow:
@@ -1465,8 +1534,48 @@ For questions or issues during frontend development:
 
 ---
 
-**Version**: 1.0  
+# 📝 Latest Updates
+
+## Version 1.1 - Authentication Enhancements (2025-10-21)
+
+### ✨ Multi-Method Login
+- **Flexible Login**: Người dùng có thể đăng nhập bằng Username, Email hoặc Phone Number
+- **Automatic Detection**: Hệ thống tự động nhận diện và tìm kiếm theo thứ tự: Username → Email → Phone
+- **Use Cases**:
+  - Admin/Staff: Login bằng username (vd: `admin`, `manager1`)
+  - Customer: Login bằng email (vd: `customer@example.com`)
+  - Guest User: Login bằng phone (vd: `0912345678`)
+
+### 🔐 First-Time Password Change for Guest Users
+- **Guest User Flow**: 
+  1. Guest User được tạo tại cửa hàng bởi Staff
+  2. Login lần đầu với phone + password mặc định (`Guest@123456`)
+  3. Response có field `requirePasswordChange: true`
+  4. Bắt buộc đổi mật khẩu qua endpoint `/api/auth/first-time-password-change`
+  5. Login lại với mật khẩu mới
+- **Security**: 
+  - Không cần mật khẩu cũ cho lần đổi đầu tiên
+  - Tự động set `requirePasswordChange = false` sau khi đổi thành công
+
+### 🔑 Default Password Configuration
+- **Centralized Config**: Mật khẩu mặc định được quản lý tập trung trong `application.properties`
+- **Configuration**:
+  ```properties
+  app.default-password=${DEFAULT_PASSWORD:washify123}
+  guest.default-password=${GUEST_DEFAULT_PASSWORD:Guest@123456}
+  ```
+- **Environment Variables**: Có thể override qua biến môi trường `DEFAULT_PASSWORD` và `GUEST_DEFAULT_PASSWORD`
+
+### 🔄 Migration V5
+- **Database Changes**: Thêm column `require_password_change` vào bảng `users`
+- **Auto-Setup**: Guest Users tự động có `require_password_change = true`
+- **Indexing**: Index trên column để optimize query performance
+
+---
+
+**Version**: 1.1  
 **Last Updated**: 2025-10-21  
 **Backend**: Spring Boot 3.3.5  
-**Database**: MySQL 8.0
+**Database**: MySQL 8.0  
+**JWT Expiry**: 24 hours
 

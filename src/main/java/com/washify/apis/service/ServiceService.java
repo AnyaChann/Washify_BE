@@ -1,5 +1,6 @@
 package com.washify.apis.service;
 
+import com.washify.apis.annotation.Audited;
 import com.washify.apis.dto.request.ServiceRequest;
 import com.washify.apis.dto.response.ServiceResponse;
 import com.washify.apis.repository.ServiceRepository;
@@ -23,6 +24,7 @@ public class ServiceService {
     /**
      * Tạo dịch vụ mới
      */
+    @Audited(action = "CREATE_SERVICE", entityType = "Service", description = "Tạo dịch vụ giặt ủi mới")
     public ServiceResponse createService(ServiceRequest request) {
         com.washify.apis.entity.Service service = new com.washify.apis.entity.Service();
         service.setName(request.getName());
@@ -68,6 +70,7 @@ public class ServiceService {
     /**
      * Cập nhật dịch vụ
      */
+    @Audited(action = "UPDATE_SERVICE", entityType = "Service", description = "Cập nhật thông tin dịch vụ")
     public ServiceResponse updateService(Long serviceId, ServiceRequest request) {
         com.washify.apis.entity.Service service = serviceRepository.findById(serviceId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy dịch vụ với ID: " + serviceId));
@@ -85,6 +88,7 @@ public class ServiceService {
     /**
      * Xóa dịch vụ
      */
+    @Audited(action = "DELETE_SERVICE", entityType = "Service", description = "Xóa dịch vụ")
     public void deleteService(Long serviceId) {
         if (!serviceRepository.existsById(serviceId)) {
             throw new RuntimeException("Không tìm thấy dịch vụ với ID: " + serviceId);

@@ -1,5 +1,6 @@
 package com.washify.apis.service;
 
+import com.washify.apis.annotation.Audited;
 import com.washify.apis.dto.request.OrderItemRequest;
 import com.washify.apis.dto.request.OrderRequest;
 import com.washify.apis.dto.response.OrderItemResponse;
@@ -36,6 +37,7 @@ public class OrderService {
      * - CUSTOMER tự đặt: truyền userId
      * - STAFF tạo cho khách: truyền phoneNumber (tự động tạo/tìm user)
      */
+    @Audited(action = "CREATE_ORDER", entityType = "Order", description = "Tạo đơn hàng mới")
     public OrderResponse createOrder(OrderRequest request) {
         User user;
         
@@ -166,6 +168,7 @@ public class OrderService {
     /**
      * Cập nhật trạng thái đơn hàng
      */
+    @Audited(action = "UPDATE_ORDER_STATUS", entityType = "Order", description = "Cập nhật trạng thái đơn hàng")
     public OrderResponse updateOrderStatus(Long orderId, String status) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với ID: " + orderId));
@@ -179,6 +182,7 @@ public class OrderService {
     /**
      * Hủy đơn hàng
      */
+    @Audited(action = "CANCEL_ORDER", entityType = "Order", description = "Hủy đơn hàng")
     public OrderResponse cancelOrder(Long orderId) {
         return updateOrderStatus(orderId, "CANCELLED");
     }

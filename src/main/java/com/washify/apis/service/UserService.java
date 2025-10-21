@@ -1,5 +1,6 @@
 package com.washify.apis.service;
 
+import com.washify.apis.annotation.Audited;
 import com.washify.apis.dto.request.UserUpdateRequest;
 import com.washify.apis.dto.response.UserResponse;
 import com.washify.apis.entity.Branch;
@@ -77,6 +78,7 @@ public class UserService {
      * Cập nhật thông tin user
      * Tự động upgrade GUEST → CUSTOMER nếu profile đầy đủ
      */
+    @Audited(action = "UPDATE_USER", entityType = "User", description = "Cập nhật thông tin user")
     public UserResponse updateUser(Long userId, UserUpdateRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
@@ -107,6 +109,7 @@ public class UserService {
     /**
      * Xóa user (soft delete)
      */
+    @Audited(action = "DELETE_USER", entityType = "User", description = "Xóa user (soft delete)")
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User", "id", userId);
@@ -117,6 +120,7 @@ public class UserService {
     /**
      * Gán role cho user
      */
+    @Audited(action = "ASSIGN_ROLE", entityType = "User", description = "Gán role cho user")
     public UserResponse assignRole(Long userId, String roleName) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));

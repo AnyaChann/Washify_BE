@@ -1,5 +1,6 @@
 package com.washify.apis.service;
 
+import com.washify.apis.annotation.Audited;
 import com.washify.apis.dto.request.BranchRequest;
 import com.washify.apis.dto.response.BranchResponse;
 import com.washify.apis.entity.Branch;
@@ -24,6 +25,7 @@ public class BranchService {
     /**
      * Tạo chi nhánh mới
      */
+    @Audited(action = "CREATE_BRANCH", entityType = "Branch", description = "Tạo chi nhánh mới")
     public BranchResponse createBranch(BranchRequest request) {
         Branch branch = new Branch();
         branch.setName(request.getName());
@@ -58,6 +60,7 @@ public class BranchService {
     /**
      * Cập nhật chi nhánh
      */
+    @Audited(action = "UPDATE_BRANCH", entityType = "Branch", description = "Cập nhật thông tin chi nhánh")
     public BranchResponse updateBranch(Long branchId, BranchRequest request) {
         Branch branch = branchRepository.findById(branchId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy chi nhánh với ID: " + branchId));
@@ -74,6 +77,7 @@ public class BranchService {
     /**
      * Xóa chi nhánh
      */
+    @Audited(action = "DELETE_BRANCH", entityType = "Branch", description = "Xóa chi nhánh")
     public void deleteBranch(Long branchId) {
         if (!branchRepository.existsById(branchId)) {
             throw new RuntimeException("Không tìm thấy chi nhánh với ID: " + branchId);

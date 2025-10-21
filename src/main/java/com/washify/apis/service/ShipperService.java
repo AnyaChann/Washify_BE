@@ -1,5 +1,6 @@
 package com.washify.apis.service;
 
+import com.washify.apis.annotation.Audited;
 import com.washify.apis.dto.request.ShipperRequest;
 import com.washify.apis.dto.response.ShipperResponse;
 import com.washify.apis.entity.Shipper;
@@ -27,6 +28,7 @@ public class ShipperService {
     /**
      * Tạo shipper mới
      */
+    @Audited(action = "CREATE_SHIPPER", entityType = "Shipper", description = "Tạo shipper mới")
     public ShipperResponse createShipper(ShipperRequest request) {
         Shipper shipper = new Shipper();
         shipper.setName(request.getFullName());
@@ -91,6 +93,7 @@ public class ShipperService {
     /**
      * Cập nhật shipper
      */
+    @Audited(action = "UPDATE_SHIPPER", entityType = "Shipper", description = "Cập nhật thông tin shipper")
     public ShipperResponse updateShipper(Long id, ShipperRequest request) {
         Shipper shipper = shipperRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy shipper với ID: " + id));
@@ -107,6 +110,7 @@ public class ShipperService {
     /**
      * Xóa shipper (soft delete)
      */
+    @Audited(action = "DELETE_SHIPPER", entityType = "Shipper", description = "Xóa mềm shipper")
     public void deleteShipper(Long id) {
         Shipper shipper = shipperRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy shipper với ID: " + id));
@@ -127,6 +131,7 @@ public class ShipperService {
     /**
      * Kích hoạt shipper
      */
+    @Audited(action = "ACTIVATE_SHIPPER", entityType = "Shipper", description = "Kích hoạt shipper")
     public ShipperResponse activateShipper(Long id) {
         Shipper shipper = shipperRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy shipper với ID: " + id));
@@ -139,6 +144,7 @@ public class ShipperService {
     /**
      * Vô hiệu hóa shipper
      */
+    @Audited(action = "DEACTIVATE_SHIPPER", entityType = "Shipper", description = "Vô hiệu hóa shipper")
     public ShipperResponse deactivateShipper(Long id) {
         Shipper shipper = shipperRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy shipper với ID: " + id));

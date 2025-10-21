@@ -22,6 +22,10 @@ public class AuditLogResponse {
     private Long entityId;
     private String username;
     private String ipAddress;
-    private String details;
+    private String userAgent;
+    private String description;
+    private String status;
+    private String errorMessage;
+    private String details; // Combined old/new value details
     private LocalDateTime timestamp;
 }

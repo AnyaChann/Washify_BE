@@ -1,5 +1,6 @@
 package com.washify.apis.service;
 
+import com.washify.apis.annotation.Audited;
 import com.washify.apis.dto.request.PaymentRequest;
 import com.washify.apis.dto.response.PaymentResponse;
 import com.washify.apis.entity.Order;
@@ -30,6 +31,7 @@ public class PaymentService {
     /**
      * Tạo thanh toán mới
      */
+    @Audited(action = "CREATE_PAYMENT", entityType = "Payment", description = "Tạo thanh toán mới")
     public PaymentResponse createPayment(PaymentRequest request) {
         // Tìm order
         Order order = orderRepository.findById(request.getOrderId())
@@ -97,6 +99,7 @@ public class PaymentService {
     /**
      * Cập nhật trạng thái thanh toán
      */
+    @Audited(action = "UPDATE_PAYMENT_STATUS", entityType = "Payment", description = "Cập nhật trạng thái thanh toán")
     public PaymentResponse updatePaymentStatus(Long paymentId, String status) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy thanh toán với ID: " + paymentId));
