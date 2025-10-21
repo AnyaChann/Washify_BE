@@ -32,6 +32,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final BranchRepository branchRepository;
     private final PasswordEncoder passwordEncoder;
+    private final GuestUserService guestUserService;
     
     /**
      * Lấy thông tin user theo ID
@@ -74,6 +75,7 @@ public class UserService {
     
     /**
      * Cập nhật thông tin user
+     * Tự động upgrade GUEST → CUSTOMER nếu profile đầy đủ
      */
     public UserResponse updateUser(Long userId, UserUpdateRequest request) {
         User user = userRepository.findById(userId)
@@ -95,6 +97,10 @@ public class UserService {
         }
         
         User updatedUser = userRepository.save(user);
+        
+        // Auto-upgrade GUEST → CUSTOMER nếu profile đã đầy đủ
+        guestUserService.upgradeGuestToCustomer(updatedUser);
+        
         return mapToUserResponse(updatedUser);
     }
     

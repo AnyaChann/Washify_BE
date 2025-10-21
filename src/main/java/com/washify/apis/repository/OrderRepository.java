@@ -66,6 +66,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByBranchId(Long branchId);
     
     /**
+     * Tìm order theo order code
+     * @param orderCode Mã đơn hàng (unique)
+     * @return Optional<Order>
+     */
+    Optional<Order> findByOrderCode(String orderCode);
+    
+    /**
      * Tính tổng doanh thu theo trạng thái
      * @param status Trạng thái đơn hàng
      * @return Tổng doanh thu

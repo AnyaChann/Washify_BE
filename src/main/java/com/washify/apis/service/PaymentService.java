@@ -6,6 +6,8 @@ import com.washify.apis.entity.Order;
 import com.washify.apis.entity.Payment;
 import com.washify.apis.repository.OrderRepository;
 import com.washify.apis.repository.PaymentRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ public class PaymentService {
     
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
+    private final MoMoPaymentService moMoPaymentService;
     
     /**
      * Tạo thanh toán mới
@@ -43,6 +46,18 @@ public class PaymentService {
         payment.setPaymentMethod(Payment.PaymentMethod.valueOf(request.getPaymentMethod()));
         payment.setPaymentStatus(Payment.PaymentStatus.PENDING);
         payment.setAmount(request.getAmount());
+        
+        // Nếu là MoMo, tạo payment URL
+        if (Payment.PaymentMethod.MOMO.name().equals(request.getPaymentMethod())) {
+            try {
+                java.util.Map<String, String> momoResult = moMoPaymentService.createMoMoPayment(payment, order.getOrderCode());
+                payment.setPaymentUrl(momoResult.get("paymentUrl"));
+                payment.setQrCode(momoResult.get("qrCodeUrl"));
+                payment.setTransactionId(momoResult.get("requestId"));
+            } catch (Exception e) {
+                throw new RuntimeException("Không thể tạo thanh toán MoMo: " + e.getMessage());
+            }
+        }
         
         Payment savedPayment = paymentRepository.save(payment);
         return mapToPaymentResponse(savedPayment);
@@ -120,10 +135,14 @@ public class PaymentService {
         return PaymentResponse.builder()
                 .id(payment.getId())
                 .orderId(payment.getOrder().getId())
+                .orderCode(payment.getOrder().getOrderCode())
                 .paymentMethod(payment.getPaymentMethod().name())
                 .paymentStatus(payment.getPaymentStatus().name())
                 .paymentDate(payment.getPaymentDate())
                 .amount(payment.getAmount())
+                .transactionId(payment.getTransactionId())
+                .paymentUrl(payment.getPaymentUrl())
+                .qrCode(payment.getQrCode())
                 .build();
     }
     
@@ -153,6 +172,50 @@ public class PaymentService {
         payment.setPaymentStatus(Payment.PaymentStatus.FAILED);
         Payment updatedPayment = paymentRepository.save(payment);
         
+        return mapToPaymentResponse(updatedPayment);
+    }
+    
+    /**
+     * Xử lý MoMo webhook callback
+     */
+    public PaymentResponse processMoMoWebhook(java.util.Map<String, String> momoResponse, String orderCode) {
+        // Verify signature
+        if (!moMoPaymentService.verifySignature(momoResponse)) {
+            throw new RuntimeException("MoMo webhook signature không hợp lệ");
+        }
+        
+        // Tìm payment theo order code
+        Order order = orderRepository.findByOrderCode(orderCode)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với mã: " + orderCode));
+        
+        Payment payment = paymentRepository.findByOrderId(order.getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thanh toán cho đơn hàng: " + orderCode));
+        
+        // Xử lý kết quả từ MoMo
+        Payment.PaymentStatus newStatus = moMoPaymentService.processMoMoCallback(momoResponse);
+        payment.setPaymentStatus(newStatus);
+        
+        // Cập nhật transaction ID từ MoMo
+        String momoTransId = momoResponse.get("transId");
+        if (momoTransId != null) {
+            payment.setTransactionId(momoTransId);
+        }
+        
+        // Lưu response từ MoMo
+        try {
+            payment.setGatewayResponse(new ObjectMapper().writeValueAsString(momoResponse));
+        } catch (JsonProcessingException e) {
+            // Log error but don't fail the transaction
+            payment.setGatewayResponse("Error serializing MoMo response: " + e.getMessage());
+        }
+        
+        // Nếu thanh toán thành công, cập nhật order status
+        if (newStatus == Payment.PaymentStatus.PAID) {
+            order.setStatus(Order.OrderStatus.IN_PROGRESS);
+            orderRepository.save(order);
+        }
+        
+        Payment updatedPayment = paymentRepository.save(payment);
         return mapToPaymentResponse(updatedPayment);
     }
     
@@ -217,8 +280,7 @@ public class PaymentService {
         
         // Số lượng theo method
         long cashCount = paymentRepository.findByPaymentMethod(Payment.PaymentMethod.CASH).size();
-        long cardCount = paymentRepository.findByPaymentMethod(Payment.PaymentMethod.CARD).size();
-        long onlineCount = paymentRepository.findByPaymentMethod(Payment.PaymentMethod.ONLINE).size();
+        long momoCount = paymentRepository.findByPaymentMethod(Payment.PaymentMethod.MOMO).size();
         
         return new PaymentStatistics(
             totalRevenue != null ? totalRevenue : 0.0,
@@ -226,8 +288,7 @@ public class PaymentService {
             totalPending,
             totalFailed,
             cashCount,
-            cardCount,
-            onlineCount
+            momoCount
         );
     }
     
@@ -240,19 +301,16 @@ public class PaymentService {
         public final long totalPending;
         public final long totalFailed;
         public final long cashPayments;
-        public final long cardPayments;
-        public final long onlinePayments;
+        public final long momoPayments;
         
         public PaymentStatistics(double totalRevenue, long totalPaid, long totalPending, 
-                               long totalFailed, long cashPayments, long cardPayments, 
-                               long onlinePayments) {
+                               long totalFailed, long cashPayments, long momoPayments) {
             this.totalRevenue = totalRevenue;
             this.totalPaid = totalPaid;
             this.totalPending = totalPending;
             this.totalFailed = totalFailed;
             this.cashPayments = cashPayments;
-            this.cardPayments = cardPayments;
-            this.onlinePayments = onlinePayments;
+            this.momoPayments = momoPayments;
         }
     }
 }

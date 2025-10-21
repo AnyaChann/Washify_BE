@@ -45,13 +45,24 @@ public class Payment {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount; // Số tiền thanh toán
     
+    @Column(name = "transaction_id")
+    private String transactionId; // Mã giao dịch từ payment gateway
+    
+    @Column(name = "payment_url", length = 500)
+    private String paymentUrl; // URL thanh toán (cho MOMO, VNPAY, etc.)
+    
+    @Column(name = "qr_code", columnDefinition = "TEXT")
+    private String qrCode; // QR code cho thanh toán (base64 hoặc URL)
+    
+    @Column(name = "gateway_response", columnDefinition = "TEXT")
+    private String gatewayResponse; // Response từ payment gateway (JSON)
+    
     /**
      * Enum định nghĩa các phương thức thanh toán
      */
     public enum PaymentMethod {
-        CASH,   // Tiền mặt
-        CARD,   // Thẻ ngân hàng
-        ONLINE  // Thanh toán online (Momo, ZaloPay, etc.)
+        CASH,           // Tiền mặt (Tại quầy / COD)
+        MOMO            // MoMo Wallet
     }
     
     /**

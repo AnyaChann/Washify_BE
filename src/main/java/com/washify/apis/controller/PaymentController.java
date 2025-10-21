@@ -130,7 +130,35 @@ public class PaymentController {
     }
     
     /**
-     * Webhook từ payment gateway (VD: Momo, ZaloPay, VNPay)
+     * MoMo Webhook/IPN Callback
+     * POST /api/payments/momo/webhook
+     * Public endpoint - MoMo gọi để thông báo kết quả thanh toán
+     */
+    @PostMapping("/momo/webhook")
+    @io.swagger.v3.oas.annotations.Operation(
+        summary = "MoMo IPN Webhook",
+        description = "Endpoint nhận callback từ MoMo khi thanh toán hoàn tất"
+    )
+    public ResponseEntity<ApiResponse<String>> handleMoMoWebhook(@RequestBody java.util.Map<String, String> momoResponse) {
+        try {
+            // Extract orderId từ MoMo response (format: WF202510210001_timestamp)
+            String orderId = momoResponse.get("orderId");
+            String orderCode = orderId != null ? orderId.split("_")[0] : null;
+            
+            paymentService.processMoMoWebhook(momoResponse, orderCode);
+            
+            return ResponseEntity.ok(ApiResponse.success("OK", "MoMo webhook xử lý thành công"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(ApiResponse.<String>builder()
+                    .success(false)
+                    .message("Lỗi xử lý MoMo webhook: " + e.getMessage())
+                    .timestamp(java.time.LocalDateTime.now())
+                    .build());
+        }
+    }
+    
+    /**
+     * Generic Webhook từ payment gateway khác (ZaloPay, VNPay)
      * POST /api/payments/webhook
      * Public endpoint - không cần authentication (sử dụng signature verification thực tế)
      */

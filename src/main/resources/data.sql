@@ -4,6 +4,18 @@
 -- Khớp với cấu trúc JPA Entities
 -- CHỈ CHẠY KHI DATABASE TRỐNG
 -- =============================================
+--
+-- THÔNG TIN HỆ THỐNG:
+-- - Payment Methods: CASH (Tiền mặt/Tại quầy/COD), MOMO (MoMo Wallet)
+-- - Roles: ADMIN, MANAGER, STAFF, SHIPPER, CUSTOMER, GUEST
+-- - Guest User System: Tự động tạo khi Staff nhập SĐT chưa có
+-- - Order Code Format: WF + YYYYMMDD + 4-digit ID (VD: WF202510210001)
+--
+-- MẬT KHẨU MẶC ĐỊNH (từ application.properties):
+-- - Admin/Manager/Staff/Shipper/Customer: app.default-password = "washify123"
+-- - Guest Users: guest.default-password = "Guest@123456"
+--
+-- =============================================
 
 -- Kiểm tra xem database đã có dữ liệu chưa
 -- Nếu đã có dữ liệu thì không chạy script này
@@ -58,7 +70,8 @@ INSERT INTO roles (name, description) VALUES
 ('MANAGER', 'Quản lý chi nhánh - Quản lý chi nhánh và nhân viên'),
 ('STAFF', 'Nhân viên - Xử lý đơn hàng và dịch vụ'),
 ('SHIPPER', 'Shipper - Giao nhận đồ giặt'),
-('CUSTOMER', 'Khách hàng - Sử dụng dịch vụ giặt ủi');
+('CUSTOMER', 'Khách hàng - Sử dụng dịch vụ giặt ủi'),
+('GUEST', 'Khách vãng lai - Tự động tạo khi Staff nhập SĐT chưa có trong hệ thống');
 
 -- =============================================
 -- 2. BRANCHES (Chi nhánh)
@@ -74,7 +87,9 @@ INSERT INTO branches (name, address, phone, manager_name, is_active, created_at,
 -- =============================================
 -- 3. USERS (Người dùng)
 -- Columns: id, full_name, username, email, password, phone, address, is_active, created_at, updated_at, deleted_at, branch_id
--- Password mặc định cho tất cả: "washify123"
+-- Password mặc định (từ application.properties):
+--   - Admin/Manager/Staff/Shipper/Customer: app.default-password = "washify123"
+--   - Guest Users: guest.default-password = "Guest@123456"
 -- BCrypt hash: $2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8
 -- =============================================
 
@@ -97,6 +112,12 @@ INSERT INTO users (full_name, username, email, password, phone, address, is_acti
 ('Nguyễn Minh Khách', 'customer1', 'customer1@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0907777777', '789 Nguyễn Trãi, Q5, TP.HCM', true, NULL, NOW(), NOW()),
 ('Trần Thị Hương', 'customer2', 'customer2@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0908888888', '321 Lê Lợi, Q1, TP.HCM', true, NULL, NOW(), NOW()),
 ('Lê Quang Minh', 'customer3', 'customer3@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0909999999', '654 Cách Mạng Tháng 8, Q10, TP.HCM', true, NULL, NOW(), NOW());
+
+-- Guest Users (Khách vãng lai - tự động tạo bởi Staff)
+-- Password: Guest@123456 (default từ application.properties)
+INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, created_at, updated_at) VALUES
+('Guest-0912345678', 'guest_0912345678', '0912345678@guest.washify.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0912345678', NULL, true, NULL, NOW(), NOW()),
+('Guest-0923456789', 'guest_0923456789', '0923456789@guest.washify.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0923456789', NULL, true, NULL, NOW(), NOW());
 
 -- =============================================
 -- 4. USER_ROLES (Gán vai trò cho người dùng)
@@ -121,6 +142,11 @@ INSERT INTO user_roles (user_id, role_id) VALUES
 (6, 5), -- customer1@gmail.com -> CUSTOMER
 (7, 5), -- customer2@gmail.com -> CUSTOMER
 (8, 5); -- customer3@gmail.com -> CUSTOMER
+
+-- Guest Users
+INSERT INTO user_roles (user_id, role_id) VALUES 
+(9, 6),  -- guest_0912345678 -> GUEST
+(10, 6); -- guest_0923456789 -> GUEST
 
 -- =============================================
 -- 5. SERVICES (Dịch vụ giặt ủi)
@@ -178,20 +204,20 @@ INSERT INTO shippers (name, phone, vehicle_number, is_active, created_at, update
 
 -- =============================================
 -- 8. SAMPLE ORDERS (Đơn hàng mẫu)
--- Columns: id, user_id, branch_id, order_date, status, total_amount, notes
+-- Columns: id, order_code, user_id, branch_id, order_date, status, total_amount, notes
 -- =============================================
 
 -- Đơn hàng 1: Đã hoàn thành
-INSERT INTO orders (user_id, branch_id, order_date, status, total_amount, notes) VALUES
-(6, 1, DATE_SUB(NOW(), INTERVAL 7 DAY), 'COMPLETED', 450000.00, 'Giao trước 10h sáng');
+INSERT INTO orders (order_code, user_id, branch_id, order_date, status, total_amount, notes) VALUES
+('WF202510140001', 6, 1, DATE_SUB(NOW(), INTERVAL 7 DAY), 'COMPLETED', 450000.00, 'Giao trước 10h sáng');
 
 -- Đơn hàng 2: Đang xử lý
-INSERT INTO orders (user_id, branch_id, order_date, status, total_amount, notes) VALUES
-(7, 2, DATE_SUB(NOW(), INTERVAL 2 DAY), 'IN_PROGRESS', 300000.00, 'Không dùng nước xả vải');
+INSERT INTO orders (order_code, user_id, branch_id, order_date, status, total_amount, notes) VALUES
+('WF202510190001', 7, 2, DATE_SUB(NOW(), INTERVAL 2 DAY), 'IN_PROGRESS', 300000.00, 'Không dùng nước xả vải');
 
 -- Đơn hàng 3: Chờ xử lý
-INSERT INTO orders (user_id, branch_id, order_date, status, total_amount) VALUES
-(8, 3, NOW(), 'PENDING', 200000.00);
+INSERT INTO orders (order_code, user_id, branch_id, order_date, status, total_amount) VALUES
+('WF202510210001', 8, 3, NOW(), 'PENDING', 200000.00);
 
 -- =============================================
 -- 9. ORDER ITEMS (Chi tiết đơn hàng)
@@ -215,14 +241,19 @@ INSERT INTO order_items (order_id, service_id, quantity, price) VALUES
 -- =============================================
 -- 10. PAYMENTS (Thanh toán)
 -- Columns: id, order_id, payment_method, payment_status, payment_date, amount
+-- Payment Methods: CASH (Tiền mặt/Tại quầy/COD), MOMO (MoMo Wallet)
 -- =============================================
--- Thanh toán cho đơn hàng 1 (đã hoàn thành)
+-- Thanh toán cho đơn hàng 1 (đã hoàn thành - Thanh toán tiền mặt)
 INSERT INTO payments (order_id, payment_method, payment_status, payment_date, amount) VALUES
 (1, 'CASH', 'PAID', DATE_SUB(NOW(), INTERVAL 5 DAY), 450000.00);
 
--- Thanh toán cho đơn hàng 2 (chưa thanh toán)
+-- Thanh toán cho đơn hàng 2 (chưa thanh toán - Thanh toán MoMo)
 INSERT INTO payments (order_id, payment_method, payment_status, payment_date, amount) VALUES
-(2, 'ONLINE', 'PENDING', DATE_SUB(NOW(), INTERVAL 2 DAY), 300000.00);
+(2, 'MOMO', 'PENDING', DATE_SUB(NOW(), INTERVAL 2 DAY), 300000.00);
+
+-- Thanh toán cho đơn hàng 3 (chưa thanh toán - Tiền mặt tại quầy)
+INSERT INTO payments (order_id, payment_method, payment_status, payment_date, amount) VALUES
+(3, 'CASH', 'PENDING', NOW(), 200000.00);
 
 -- =============================================
 -- 11. SHIPMENTS (Giao nhận)

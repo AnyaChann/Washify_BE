@@ -29,20 +29,37 @@ public class OrderService {
     private final BranchRepository branchRepository;
     private final ServiceRepository serviceRepository;
     private final PromotionRepository promotionRepository;
+    private final GuestUserService guestUserService;
     
     /**
      * Tạo đơn hàng mới
+     * - CUSTOMER tự đặt: truyền userId
+     * - STAFF tạo cho khách: truyền phoneNumber (tự động tạo/tìm user)
      */
     public OrderResponse createOrder(OrderRequest request) {
-        // Tìm user
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + request.getUserId()));
+        User user;
+        
+        // Xác định user: từ userId hoặc phoneNumber
+        if (request.getUserId() != null) {
+            // Case 1: Customer tự đặt (có userId từ JWT)
+            user = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + request.getUserId()));
+        } else if (request.getPhoneNumber() != null && !request.getPhoneNumber().isEmpty()) {
+            // Case 2: Staff tạo cho khách (có phoneNumber)
+            // Tự động tìm hoặc tạo GUEST user
+            user = guestUserService.findOrCreateUserByPhone(request.getPhoneNumber());
+        } else {
+            throw new RuntimeException("Phải cung cấp userId hoặc phoneNumber");
+        }
         
         // Tạo order
         Order order = new Order();
         order.setUser(user);
         order.setNotes(request.getNotes());
         order.setStatus(Order.OrderStatus.PENDING);
+        
+        // Generate order code (WF + YYYYMMDD + incrementing number)
+        // Will be set after save to get the ID
         
         // Set branch nếu có
         if (request.getBranchId() != null) {
@@ -97,7 +114,22 @@ public class OrderService {
         order.setTotalAmount(totalAmount);
         Order savedOrder = orderRepository.save(order);
         
+        // Generate and update order code after save (to get ID)
+        String orderCode = generateOrderCode(savedOrder.getId(), savedOrder.getOrderDate());
+        savedOrder.setOrderCode(orderCode);
+        savedOrder = orderRepository.save(savedOrder);
+        
         return mapToOrderResponse(savedOrder);
+    }
+    
+    /**
+     * Generate order code: WF + YYYYMMDD + ID (padded to 4 digits)
+     * Example: WF202510210001
+     */
+    private String generateOrderCode(Long orderId, java.time.LocalDateTime orderDate) {
+        String dateStr = orderDate.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String idStr = String.format("%04d", orderId);
+        return "WF" + dateStr + idStr;
     }
     
     /**

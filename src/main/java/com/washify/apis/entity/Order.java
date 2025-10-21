@@ -31,6 +31,9 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(name = "order_code", unique = true, nullable = false, length = 50)
+    private String orderCode; // Mã đơn hàng (VD: WF202510210001)
+    
     // Many-to-One: Nhiều orders thuộc một user
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
