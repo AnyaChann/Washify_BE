@@ -86,38 +86,41 @@ INSERT INTO branches (name, address, phone, manager_name, is_active, created_at,
 
 -- =============================================
 -- 3. USERS (Người dùng)
--- Columns: id, full_name, username, email, password, phone, address, is_active, created_at, updated_at, deleted_at, branch_id
+-- Columns: id, full_name, username, email, password, phone, address, is_active, created_at, updated_at, deleted_at, branch_id, require_password_change
 -- Password mặc định (từ application.properties):
 --   - Admin/Manager/Staff/Shipper/Customer: app.default-password = "washify123"
 --   - Guest Users: guest.default-password = "Guest@123456"
--- BCrypt hash: $2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8
+-- BCrypt hashes:
+--   - washify123: $2a$10$neRhx17ItNQx0LUp90x3QuyF6cWZF.X.iqGo5jdnXxqMavqJwn7G.
+--   - Guest@123456: $2a$10$9FgD.xOWgEyyGzzCwVu6UuJovkvNhKtCYsANW5O.DSuMcGyV5bPoW
 -- =============================================
 
 -- Admin (không thuộc branch nào)
-INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, created_at, updated_at) VALUES
-('Admin Washify', 'admin', 'admin@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234567', '123 Admin Street, TP.HCM', true, NULL, NOW(), NOW());
+INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, require_password_change, created_at, updated_at) VALUES
+('Admin Washify', 'admin', 'admin@washify.vn', '$2a$10$neRhx17ItNQx0LUp90x3QuyF6cWZF.X.iqGo5jdnXxqMavqJwn7G.', '0901234567', '123 Admin Street, TP.HCM', true, NULL, false, NOW(), NOW());
 
 -- Managers (thuộc các chi nhánh)
-INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, created_at, updated_at) VALUES
-('Nguyễn Văn Manager', 'manager1', 'manager.quan1@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234568', '123 Nguyễn Huệ, Q1, TP.HCM', true, 1, NOW(), NOW()),
-('Trần Thị Lan', 'manager2', 'manager.quan3@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234569', '456 Võ Văn Tần, Q3, TP.HCM', true, 2, NOW(), NOW());
+INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, require_password_change, created_at, updated_at) VALUES
+('Nguyễn Văn Manager', 'manager1', 'manager.quan1@washify.vn', '$2a$10$neRhx17ItNQx0LUp90x3QuyF6cWZF.X.iqGo5jdnXxqMavqJwn7G.', '0901234568', '123 Nguyễn Huệ, Q1, TP.HCM', true, 1, false, NOW(), NOW()),
+('Trần Thị Lan', 'manager2', 'manager.quan3@washify.vn', '$2a$10$neRhx17ItNQx0LUp90x3QuyF6cWZF.X.iqGo5jdnXxqMavqJwn7G.', '0901234569', '456 Võ Văn Tần, Q3, TP.HCM', true, 2, false, NOW(), NOW());
 
 -- Staff (thuộc các chi nhánh)
-INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, created_at, updated_at) VALUES
-('Lê Văn Staff', 'staff1', 'staff1@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234570', '100 Staff Road, TP.HCM', true, 1, NOW(), NOW()),
-('Phạm Thị Hoa', 'staff2', 'staff2@washify.vn', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0901234571', '200 Staff Avenue, TP.HCM', true, 2, NOW(), NOW());
+INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, require_password_change, created_at, updated_at) VALUES
+('Lê Văn Staff', 'staff1', 'staff1@washify.vn', '$2a$10$neRhx17ItNQx0LUp90x3QuyF6cWZF.X.iqGo5jdnXxqMavqJwn7G.', '0901234570', '100 Staff Road, TP.HCM', true, 1, false, NOW(), NOW()),
+('Phạm Thị Hoa', 'staff2', 'staff2@washify.vn', '$2a$10$neRhx17ItNQx0LUp90x3QuyF6cWZF.X.iqGo5jdnXxqMavqJwn7G.', '0901234571', '200 Staff Avenue, TP.HCM', true, 2, false, NOW(), NOW());
 
 -- Customers (không thuộc branch)
-INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, created_at, updated_at) VALUES
-('Nguyễn Minh Khách', 'customer1', 'customer1@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0907777777', '789 Nguyễn Trãi, Q5, TP.HCM', true, NULL, NOW(), NOW()),
-('Trần Thị Hương', 'customer2', 'customer2@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0908888888', '321 Lê Lợi, Q1, TP.HCM', true, NULL, NOW(), NOW()),
-('Lê Quang Minh', 'customer3', 'customer3@gmail.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0909999999', '654 Cách Mạng Tháng 8, Q10, TP.HCM', true, NULL, NOW(), NOW());
+INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, require_password_change, created_at, updated_at) VALUES
+('Nguyễn Minh Khách', 'customer1', 'customer1@gmail.com', '$2a$10$neRhx17ItNQx0LUp90x3QuyF6cWZF.X.iqGo5jdnXxqMavqJwn7G.', '0907777777', '789 Nguyễn Trãi, Q5, TP.HCM', true, NULL, false, NOW(), NOW()),
+('Trần Thị Hương', 'customer2', 'customer2@gmail.com', '$2a$10$neRhx17ItNQx0LUp90x3QuyF6cWZF.X.iqGo5jdnXxqMavqJwn7G.', '0908888888', '321 Lê Lợi, Q1, TP.HCM', true, NULL, false, NOW(), NOW()),
+('Lê Quang Minh', 'customer3', 'customer3@gmail.com', '$2a$10$neRhx17ItNQx0LUp90x3QuyF6cWZF.X.iqGo5jdnXxqMavqJwn7G.', '0909999999', '654 Cách Mạng Tháng 8, Q10, TP.HCM', true, NULL, false, NOW(), NOW());
 
 -- Guest Users (Khách vãng lai - tự động tạo bởi Staff)
 -- Password: Guest@123456 (default từ application.properties)
-INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, created_at, updated_at) VALUES
-('Guest-0912345678', 'guest_0912345678', '0912345678@guest.washify.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0912345678', NULL, true, NULL, NOW(), NOW()),
-('Guest-0923456789', 'guest_0923456789', '0923456789@guest.washify.com', '$2a$10$xK5nN7nK5nN7nK5nN7nK5uXqZ8yY8yY8yY8yY8yY8yY8yY8yY8yY8', '0923456789', NULL, true, NULL, NOW(), NOW());
+-- require_password_change = TRUE: Bắt buộc đổi mật khẩu lần đầu login
+INSERT INTO users (full_name, username, email, password, phone, address, is_active, branch_id, require_password_change, created_at, updated_at) VALUES
+('Guest-0912345678', 'guest_0912345678', '0912345678@guest.washify.com', '$2a$10$9FgD.xOWgEyyGzzCwVu6UuJovkvNhKtCYsANW5O.DSuMcGyV5bPoW', '0912345678', NULL, true, NULL, true, NOW(), NOW()),
+('Guest-0923456789', 'guest_0923456789', '0923456789@guest.washify.com', '$2a$10$9FgD.xOWgEyyGzzCwVu6UuJovkvNhKtCYsANW5O.DSuMcGyV5bPoW', '0923456789', NULL, true, NULL, true, NOW(), NOW());
 
 -- =============================================
 -- 4. USER_ROLES (Gán vai trò cho người dùng)

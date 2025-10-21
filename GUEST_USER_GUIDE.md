@@ -30,6 +30,8 @@ Tự động upgrade GUEST → CUSTOMER
 - **Mục đích**: Tài khoản tạm thời cho khách vãng lai
 - **Quyền hạn**: Giới hạn, chỉ có thể xem đơn hàng của mình
 - **Tự động tạo**: Khi STAFF nhập SĐT chưa có trong hệ thống
+- **Password**: Mặc định `Guest@123456` (từ `application.properties`)
+- **Bắt buộc đổi password**: Lần đầu login phải đổi mật khẩu mới
 - **Auto-upgrade**: Lên CUSTOMER khi cập nhật đầy đủ thông tin
 
 ### CUSTOMER Role
@@ -70,7 +72,89 @@ guest.default-password=Guest@123456
 
 ---
 
-## 📝 API Usage
+## � First-Time Password Change
+
+### Flow
+
+```
+STAFF tạo order với SĐT mới
+    ↓
+Backend tạo GUEST user
+    - Username: guest_0912345678
+    - Password: Guest@123456
+    - requirePasswordChange: true
+    ↓
+Guest User đăng nhập lần đầu
+    ↓
+Backend response: requirePasswordChange = true
+    ↓
+Frontend redirect → trang đổi mật khẩu
+    ↓
+Guest User nhập password mới
+    ↓
+Backend set requirePasswordChange = false
+    ↓
+Guest User có thể dùng app bình thường
+```
+
+### API: Login
+
+**Endpoint**: `POST /api/auth/login`
+
+**Request**:
+```json
+{
+  "username": "guest_0912345678",
+  "password": "Guest@123456"
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1...",
+    "userId": 789,
+    "username": "guest_0912345678",
+    "roles": ["GUEST"],
+    "requirePasswordChange": true  // ← Frontend check field này!
+  }
+}
+```
+
+### API: First-Time Password Change
+
+**Endpoint**: `POST /api/auth/first-time-password-change`
+
+**Auth**: Bearer token (GUEST role)
+
+**Request**:
+```json
+{
+  "newPassword": "MyNewPassword123!",
+  "confirmPassword": "MyNewPassword123!"
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Đổi mật khẩu thành công",
+  "data": "Password updated successfully. You can now use the new password."
+}
+```
+
+**Note**:
+- Không cần nhập `currentPassword` (vì đã login)
+- Frontend phải validate `newPassword === confirmPassword`
+- Sau khi đổi thành công, `requirePasswordChange = false`
+- Lần login tiếp theo không bị bắt đổi password nữa
+
+---
+
+## �📝 API Usage
 
 ### Case 1: Customer Tự Đặt Hàng (Online)
 

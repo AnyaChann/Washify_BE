@@ -52,6 +52,9 @@ public class User {
     @Column(name = "is_active")
     private Boolean isActive = true; // Trạng thái hoạt động
     
+    @Column(name = "require_password_change")
+    private Boolean requirePasswordChange = false; // Bắt buộc đổi mật khẩu (dùng cho Guest User lần đầu login)
+    
     @Column(name = "require_email_verification_for_password_change")
     private Boolean requireEmailVerificationForPasswordChange = false; // Bảo mật 2 lớp cho đổi password (mặc định: tắt)
     

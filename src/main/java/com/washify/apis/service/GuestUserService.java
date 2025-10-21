@@ -68,6 +68,7 @@ public class GuestUserService {
         guestUser.setFullName("Guest-" + phoneNumber);
         guestUser.setEmail(generateGuestEmail(phoneNumber));
         guestUser.setIsActive(true);
+        guestUser.setRequirePasswordChange(true); // Bắt buộc đổi mật khẩu lần đầu login
         guestUser.setRoles(Set.of(guestRole));
         
         return userRepository.save(guestUser);

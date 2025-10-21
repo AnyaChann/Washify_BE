@@ -25,4 +25,5 @@ public class AuthResponse {
     private String email;
     private String fullName;
     private java.util.List<String> roles;
+    private Boolean requirePasswordChange; // Bắt buộc đổi mật khẩu (dùng cho Guest User)
 }

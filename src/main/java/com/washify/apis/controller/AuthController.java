@@ -99,9 +99,11 @@ public class AuthController {
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .roles(user.getRoles().stream().map(Role::getName).toList())
+                .requirePasswordChange(user.getRequirePasswordChange() != null && user.getRequirePasswordChange())
                 .build();
 
-        log.info("User {} logged in successfully", loginRequest.getUsername());
+        log.info("User {} logged in successfully. Require password change: {}", 
+                loginRequest.getUsername(), user.getRequirePasswordChange());
 
         return ResponseEntity.ok(ApiResponse.<AuthResponse>builder()
                 .success(true)
@@ -235,6 +237,71 @@ public class AuthController {
                         .data(authResponse)
                         .timestamp(LocalDateTime.now())
                         .build());
+    }
+
+    /**
+     * Đổi mật khẩu lần đầu cho Guest User
+     */
+    @PostMapping("/first-time-password-change")
+    @Operation(
+        summary = "🔐 Đổi mật khẩu lần đầu (Guest User)", 
+        description = """
+            **Access:** 🔐 Authenticated - Yêu cầu đăng nhập (GUEST role)
+            
+            Đổi mật khẩu lần đầu cho Guest User sau khi login.
+            
+            **Flow:**
+            1. Guest User đăng nhập với password mặc định (Guest@123456)
+            2. Backend trả về requirePasswordChange = true
+            3. Frontend redirect đến trang đổi mật khẩu
+            4. Guest User nhập mật khẩu mới
+            5. Backend cập nhật password và set requirePasswordChange = false
+            
+            **Note:**
+            - Không cần nhập current password (vì đã login)
+            - Chỉ Guest User mới được dùng endpoint này
+            - Sau khi đổi password thành công, requirePasswordChange = false
+            
+            **Validations:**
+            - New password: Tối thiểu 6 ký tự
+            - Confirm password: Phải khớp với new password
+            """
+    )
+    public ResponseEntity<ApiResponse<String>> firstTimePasswordChange(
+            @Valid @RequestBody com.washify.apis.dto.request.FirstTimePasswordChangeRequest request,
+            Authentication authentication) {
+        
+        String username = authentication.getName();
+        log.info("First-time password change request for user: {}", username);
+        
+        // Get user
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+        
+        // Kiểm tra xem user có requirePasswordChange không
+        if (user.getRequirePasswordChange() == null || !user.getRequirePasswordChange()) {
+            throw new BadRequestException("Tài khoản này không cần đổi mật khẩu lần đầu");
+        }
+        
+        // Validate passwords match
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new BadRequestException("Mật khẩu mới và xác nhận mật khẩu không khớp");
+        }
+        
+        // Update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setRequirePasswordChange(false);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        
+        log.info("User {} changed password successfully on first login", username);
+        
+        return ResponseEntity.ok(ApiResponse.<String>builder()
+                .success(true)
+                .message("Đổi mật khẩu thành công")
+                .data("Password updated successfully. You can now use the new password.")
+                .timestamp(LocalDateTime.now())
+                .build());
     }
 
     /**
