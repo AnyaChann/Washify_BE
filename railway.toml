@@ -2,4 +2,4 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "java -Dserver.port=$PORT -jar target/Washify_BE-0.0.1-SNAPSHOT.jar"
+startCommand = "java -Xms256m -Xmx512m -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -Dserver.port=$PORT -jar target/Washify_BE-0.0.1-SNAPSHOT.jar"
