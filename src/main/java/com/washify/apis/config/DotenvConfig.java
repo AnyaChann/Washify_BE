@@ -5,43 +5,59 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * DotenvConfig - Load environment variables from .env file
+ * DotenvConfig - Load environment variables from .env file OR OS environment
  * 
  * Purpose:
- * - Tự động load các biến môi trường từ file .env khi app khởi động
- * - Giống cách Node.js sử dụng dotenv package
+ * - Development: Tự động load từ file .env (giống Node.js)
+ * - Production (Railway, Heroku, etc.): Dùng OS environment variables
  * - File .env phải nằm ở root project (cùng cấp với pom.xml)
  * 
  * How it works:
  * 1. Spring khởi động → @Configuration được load
- * 2. @PostConstruct method được gọi sau khi bean được tạo
- * 3. Dotenv đọc file .env → load vào System.properties
- * 4. Spring đọc ${ENV_VAR} từ application.properties → tìm trong System.properties
- * 5. Nếu không có trong .env → dùng default value sau dấu ':'
+ * 2. @PostConstruct method được gọi
+ * 3. Kiểm tra OS environment variables trước
+ * 4. Nếu có DATABASE_URL trong OS env → skip .env file (Production mode)
+ * 5. Nếu không → load từ .env file (Development mode)
  * 
- * Example:
- * File .env:
- *   DATABASE_URL=jdbc:mysql://production.com:3306/washify
+ * Priority Order:
+ * 1. OS Environment Variables (Railway, Heroku set qua dashboard)
+ * 2. .env file (local development)
+ * 3. application.properties defaults
  * 
- * File application.properties:
- *   spring.datasource.url=${DATABASE_URL:jdbc:mysql://localhost:3306/washify_db}
- * 
- * Result:
- *   - Có .env → dùng production.com
- *   - Không có .env → dùng localhost (default)
+ * Railway.com / Cloud Platforms:
+ * - Railway tự động inject env vars vào OS environment
+ * - KHÔNG cần file .env trên production
+ * - Set variables qua Railway dashboard: Settings → Variables
  * 
  * Security:
  * - File .env KHÔNG được commit lên Git
- * - Chỉ commit .env.example làm template
- * - Mỗi developer/server có .env riêng
+ * - Production dùng Railway/Heroku dashboard để set env vars
  */
 @Configuration
 public class DotenvConfig {
 
     @PostConstruct
     public void loadDotenv() {
+        // Kiểm tra xem đã có OS environment variables chưa
+        String osEnvCheck = System.getenv("DATABASE_URL");
+        
+        if (osEnvCheck != null && !osEnvCheck.isEmpty()) {
+            // Production mode: Railway/Heroku đã inject env vars
+            System.out.println("✅ [DotenvConfig] Running in PRODUCTION mode - Using OS environment variables");
+            System.out.println("   DATABASE_URL found in OS environment");
+            
+            // Load tất cả OS env vars vào System.properties để Spring Boot có thể đọc
+            System.getenv().forEach((key, value) -> {
+                if (System.getProperty(key) == null) {
+                    System.setProperty(key, value);
+                }
+            });
+            
+            return; // Skip .env file loading
+        }
+        
+        // Development mode: Load từ .env file
         try {
-            // Load .env file từ root project
             Dotenv dotenv = Dotenv.configure()
                     .directory("./")           // Tìm .env ở root project
                     .ignoreIfMissing()         // Không crash nếu không có .env
@@ -53,16 +69,16 @@ public class DotenvConfig {
                 String value = entry.getValue();
                 
                 // Chỉ set nếu chưa có trong System.properties
-                // (OS environment variables có priority cao hơn)
                 if (System.getProperty(key) == null) {
                     System.setProperty(key, value);
                 }
             });
 
-            System.out.println("✅ [DotenvConfig] Loaded " + dotenv.entries().size() + " environment variables from .env file");
+            System.out.println("✅ [DotenvConfig] Running in DEVELOPMENT mode - Loaded " + dotenv.entries().size() + " variables from .env file");
 
         } catch (Exception e) {
-            System.out.println("⚠️  [DotenvConfig] Could not load .env file (this is OK if using OS environment variables): " + e.getMessage());
+            System.out.println("⚠️  [DotenvConfig] No .env file found - Using application.properties defaults");
+            System.out.println("   This is OK for Railway/Heroku deployments (they use OS environment variables)");
         }
     }
 }
