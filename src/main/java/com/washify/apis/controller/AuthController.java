@@ -58,17 +58,26 @@ public class AuthController {
         description = """
             **Access:** 🌐 Public - Không cần authentication
             
-            Đăng nhập với username và password để lấy JWT token.
+            Đăng nhập với username/email/phone và password để lấy JWT token.
+            
+            **Login Methods:**
+            - Username: "admin", "staff1", "customer1", etc.
+            - Email: "admin@washify.vn", "customer1@gmail.com", etc.
+            - Phone: "0912345678", "0901234567", etc.
             
             **Flow:**
-            1. Gửi username + password
+            1. Gửi username/email/phone + password
             2. Server xác thực
             3. Trả về JWT token + user info
             4. Sử dụng token cho các API khác
             
+            **Guest User:**
+            - requirePasswordChange = true → Phải đổi password lần đầu
+            - Frontend redirect to change password page
+            
             **Response:**
             - Token: JWT token (valid 24h)
-            - User info: id, username, email, roles
+            - User info: id, username, email, roles, requirePasswordChange
             """
     )
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -87,9 +96,11 @@ public class AuthController {
         // Generate JWT token
         String token = jwtTokenProvider.generateToken(authentication);
 
-        // Get user info
+        // Get user info - Tìm theo username/email/phone
         User user = userRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new BadRequestException("User not found"));
+                .orElseGet(() -> userRepository.findByEmail(loginRequest.getUsername())
+                        .orElseGet(() -> userRepository.findByPhone(loginRequest.getUsername())
+                                .orElseThrow(() -> new BadRequestException("User not found"))));
 
         AuthResponse authResponse = AuthResponse.builder()
                 .token(token)

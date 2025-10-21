@@ -25,13 +25,17 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public UserDetails loadUserByUsername(String usernameOrEmailOrPhone) throws UsernameNotFoundException {
+        // Tìm user bằng username, email hoặc phone
+        User user = userRepository.findByUsername(usernameOrEmailOrPhone)
+                .orElseGet(() -> userRepository.findByEmail(usernameOrEmailOrPhone)
+                        .orElseGet(() -> userRepository.findByPhone(usernameOrEmailOrPhone)
+                                .orElseThrow(() -> new UsernameNotFoundException(
+                                        "User not found with username/email/phone: " + usernameOrEmailOrPhone))));
 
         // Check if user is deleted (soft delete check via deletedAt field)
         if (user.getDeletedAt() != null) {
-            throw new UsernameNotFoundException("User has been deleted: " + username);
+            throw new UsernameNotFoundException("User has been deleted: " + usernameOrEmailOrPhone);
         }
 
         Set<GrantedAuthority> authorities = user.getRoles().stream()
