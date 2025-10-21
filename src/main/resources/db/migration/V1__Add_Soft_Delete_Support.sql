@@ -2,7 +2,7 @@
 -- SOFT DELETE MIGRATION SCRIPT
 -- ========================================
 -- Purpose: Add soft delete support to Washify database
--- Date: 2024
+-- Date: 2025
 -- Version: 1.0
 -- ========================================
 
@@ -65,11 +65,11 @@ UPDATE users SET is_active = TRUE WHERE is_active IS NULL;
 UPDATE branches SET is_active = TRUE WHERE is_active IS NULL;
 
 -- Set created_at cho existing records (dùng earliest possible timestamp)
-UPDATE users SET created_at = '2024-01-01 00:00:00' WHERE created_at IS NULL;
-UPDATE branches SET created_at = '2024-01-01 00:00:00' WHERE created_at IS NULL;
-UPDATE services SET created_at = '2024-01-01 00:00:00' WHERE created_at IS NULL;
-UPDATE promotions SET created_at = '2024-01-01 00:00:00' WHERE created_at IS NULL;
-UPDATE shippers SET created_at = '2024-01-01 00:00:00' WHERE created_at IS NULL;
+UPDATE users SET created_at = '2025-01-01 00:00:00' WHERE created_at IS NULL;
+UPDATE branches SET created_at = '2025-01-01 00:00:00' WHERE created_at IS NULL;
+UPDATE services SET created_at = '2025-01-01 00:00:00' WHERE created_at IS NULL;
+UPDATE promotions SET created_at = '2025-01-01 00:00:00' WHERE created_at IS NULL;
+UPDATE shippers SET created_at = '2025-01-01 00:00:00' WHERE created_at IS NULL;
 
 -- ========================================
 -- PHASE 3: ADD INDEXES FOR PERFORMANCE

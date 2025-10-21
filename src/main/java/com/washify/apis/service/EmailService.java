@@ -222,7 +222,7 @@ public class EmailService {
                         <p>Email này được gửi tự động từ hệ thống <strong>%s</strong></p>
                         <p>Vui lòng không trả lời email này.</p>
                         <p style="margin-top: 15px;">
-                            © 2024 %s. All rights reserved.
+                            © 2025 %s. All rights reserved.
                         </p>
                     </div>
                 </div>
