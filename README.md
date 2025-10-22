@@ -142,7 +142,7 @@ EMAIL_PASSWORD=your-app-password
 
 **Configuration:**
 - Java 17 runtime
-- Memory: 512MB (optimized)
+- Memory: 512MB (optimised)
 - Database: Aiven MySQL (1GB free tier)
 - SSL/TLS: Enabled
 
@@ -252,10 +252,10 @@ This is a private academic project. Contributions are limited to team members.
 
 ## 👥 Team
 
-- **Backend Lead**: [Your Name]
-- **Database**: [Team Member]
-- **Frontend**: [Team Member]
-- **Mobile**: [Team Member]
+- **Backend Lead**: [Bach To Xuan]
+- **Database**: [Bach To Xuan]
+- **Frontend**: [Bach To Xuan]
+- **Mobile**: [Bach To Xuan]
 
 ---
 
@@ -270,10 +270,10 @@ Private academic project - All rights reserved
 For questions or issues:
 1. Check [API Documentation](./docs/api/README.md)
 2. Review [Testing Guide](./docs/api/references/testing-guide.md)
-3. Contact backend team
+3. Contact the backend team
 
 ---
 
 **Last Updated**: 2025-10-22  
-**Version**: 1.1  
+**Version**: 1.1.1  
 **Status**: ✅ Production Ready
