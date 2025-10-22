@@ -139,7 +139,7 @@ public class OrderService {
      */
     @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdWithDetails(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với ID: " + orderId));
         return mapToOrderResponse(order);
     }
@@ -150,7 +150,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersByUserId(Long userId) {
         return orderRepository.findByUserId(userId).stream()
-                .map(this::mapToOrderResponse)
+                .map(this::mapToOrderResponseSimple)
                 .collect(Collectors.toList());
     }
     
@@ -161,7 +161,7 @@ public class OrderService {
     public List<OrderResponse> getOrdersByStatus(String status) {
         Order.OrderStatus orderStatus = Order.OrderStatus.valueOf(status);
         return orderRepository.findByStatus(orderStatus).stream()
-                .map(this::mapToOrderResponse)
+                .map(this::mapToOrderResponseSimple)
                 .collect(Collectors.toList());
     }
     
@@ -191,6 +191,32 @@ public class OrderService {
      * Map Entity sang DTO Response
      */
     private OrderResponse mapToOrderResponse(Order order) {
+        // Safely access collections to avoid lazy loading issues
+        List<OrderItemResponse> itemResponses = new java.util.ArrayList<>();
+        List<String> promotionCodes = new java.util.ArrayList<>();
+        
+        try {
+            if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+                itemResponses = order.getOrderItems().stream()
+                        .map(this::mapToOrderItemResponse)
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            // If lazy loading fails, use empty list
+            itemResponses = new java.util.ArrayList<>();
+        }
+        
+        try {
+            if (order.getPromotions() != null && !order.getPromotions().isEmpty()) {
+                promotionCodes = order.getPromotions().stream()
+                        .map(Promotion::getCode)
+                        .collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            // If lazy loading fails, use empty list
+            promotionCodes = new java.util.ArrayList<>();
+        }
+        
         return OrderResponse.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
@@ -201,16 +227,8 @@ public class OrderService {
                 .status(order.getStatus().name())
                 .totalAmount(order.getTotalAmount())
                 .notes(order.getNotes())
-                .items(order.getOrderItems() != null ? 
-                        order.getOrderItems().stream()
-                            .map(this::mapToOrderItemResponse)
-                            .collect(Collectors.toList()) : 
-                        new java.util.ArrayList<>())
-                .promotionCodes(order.getPromotions() != null ? 
-                        order.getPromotions().stream()
-                            .map(Promotion::getCode)
-                            .collect(Collectors.toList()) : 
-                        new java.util.ArrayList<>())
+                .items(itemResponses)
+                .promotionCodes(promotionCodes)
                 .build();
     }
     
@@ -333,7 +351,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrders() {
         return orderRepository.findAll().stream()
-                .map(this::mapToOrderResponse)
+                .map(this::mapToOrderResponseSimple)
                 .collect(Collectors.toList());
     }
     

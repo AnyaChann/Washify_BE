@@ -1,5 +1,6 @@
 package com.washify.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -65,6 +66,7 @@ public class Promotion {
     private LocalDateTime deletedAt;
     
     // Many-to-Many với Order (phía bị map)
+    @JsonIgnore // Tránh circular reference Promotion ↔ Order
     @ManyToMany(mappedBy = "promotions")
     private Set<Order> orders = new HashSet<>();
     

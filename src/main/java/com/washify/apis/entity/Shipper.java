@@ -1,5 +1,6 @@
 package com.washify.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -54,6 +55,7 @@ public class Shipper {
     private LocalDateTime deletedAt;
     
     // One-to-Many: Một shipper có nhiều shipments
+    @JsonIgnore // Tránh circular reference Shipper ↔ Shipment ↔ Order
     @OneToMany(mappedBy = "shipper")
     private Set<Shipment> shipments = new HashSet<>();
 }

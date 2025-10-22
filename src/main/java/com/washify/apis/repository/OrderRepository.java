@@ -73,6 +73,20 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByOrderCode(String orderCode);
     
     /**
+     * Tìm order theo ID với eager loading
+     * @param id ID của order
+     * @return Optional<Order> với collections đã load
+     */
+    @Query("SELECT DISTINCT o FROM Order o " +
+           "LEFT JOIN FETCH o.user " +
+           "LEFT JOIN FETCH o.branch " +
+           "LEFT JOIN FETCH o.orderItems oi " +
+           "LEFT JOIN FETCH oi.service " +
+           "LEFT JOIN FETCH o.promotions " +
+           "WHERE o.id = :id")
+    Optional<Order> findByIdWithDetails(@Param("id") Long id);
+    
+    /**
      * Tính tổng doanh thu theo trạng thái
      * @param status Trạng thái đơn hàng
      * @return Tổng doanh thu

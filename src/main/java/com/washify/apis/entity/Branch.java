@@ -1,5 +1,6 @@
 package com.washify.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -57,10 +58,12 @@ public class Branch {
     private LocalDateTime deletedAt;
     
     // One-to-Many: Một branch có nhiều users
+    @JsonIgnore // Tránh circular reference Branch ↔ User
     @OneToMany(mappedBy = "branch")
     private Set<User> users = new HashSet<>();
     
     // One-to-Many: Một branch có nhiều orders
+    @JsonIgnore // Tránh circular reference Branch ↔ Order
     @OneToMany(mappedBy = "branch")
     private Set<Order> orders = new HashSet<>();
 }
