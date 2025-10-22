@@ -15,17 +15,18 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
+        registry.addMapping("/api/**");
+        registry.addMapping("/**")
                 // TESTING: Cho phép tất cả origins
                 .allowedOriginPatterns("*")
                 
                 // PRODUCTION: Uncomment và chỉ định origins cụ thể
-                // .allowedOrigins(
-                //         "http://localhost:3000",
-                //         "http://localhost:4200",
-                //         "http://localhost:5173",
-                //         "https://your-production-domain.com"
-                // )
+                .allowedOrigins(
+                        "http://localhost:3000",
+                        "http://localhost:4200",
+                        "http://localhost:5173",
+                        "https://your-production-domain.com"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
