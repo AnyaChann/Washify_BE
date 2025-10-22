@@ -1,4 +1,47 @@
-# 📚 Washify API Documentation for Frontend Development
+# 📚 Washify API Documentation
+
+> **⚠️ Documentation đã được tách ra thành các module riêng biệt!**
+> 
+> Vui lòng xem tài liệu mới tại: **[docs/api/README.md](./docs/api/README.md)**
+
+---
+
+## � Cấu trúc Documentation Mới
+
+### 🎯 Theo Priority (Phát triển tuần tự)
+
+1. **[Customer Web Application](./docs/api/01-customer-web-app.md)** ⭐ Priority 1
+   - Authentication & User Management
+   - Services, Branches, Orders
+   - Payments, Promotions, Reviews
+   - Notifications
+
+2. **[Admin & Manager Dashboard](./docs/api/02-admin-manager-dashboard.md)** ⭐ Priority 2
+   - Dashboard & Statistics
+   - Branch, User, Service Management
+   - Promotion, Shipper, Order Management
+   - Payment, Review, Audit Logs
+
+3. **[Staff Portal](./docs/api/03-staff-portal.md)** ⭐ Priority 3
+   - Order Processing
+   - Shipment Management
+   - Customer Support
+
+4. **[Shipper Mobile App](./docs/api/04-shipper-mobile-app.md)** ⭐ Priority 4
+   - Shipment Operations
+   - Image Upload
+   - Statistics
+
+### 📖 References
+
+- **[Response Formats](./docs/api/references/response-formats.md)** - Success/Error responses, HTTP status codes
+- **[Status Flows](./docs/api/references/status-flows.md)** - Order/Payment/Shipment status transitions
+- **[Error Handling](./docs/api/references/error-handling.md)** - Frontend error handling best practices
+- **[Testing Guide](./docs/api/references/testing-guide.md)** - Postman collections, test flows
+
+---
+
+## 🚀 Quick Start
 
 **Base URL**: `http://localhost:8080/api`
 
@@ -6,14 +49,56 @@
 
 **Header**: `Authorization: Bearer <token>`
 
+### Register & Login
+
+```bash
+# Register
+POST /api/auth/register
+{
+  "email": "customer@example.com",
+  "password": "Password123",
+  "fullName": "Nguyễn Văn A",
+  "phone": "0901234567"
+}
+
+# Login (username, email, or phone)
+POST /api/auth/login
+{
+  "username": "customer@example.com",
+  "password": "Password123"
+}
+```
+
+### Use Token
+
+```bash
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+```
+
 ---
 
-## 📋 Table of Contents
+## 🎯 Order Status Flow
 
-1. [Customer Web Application](#1-customer-web-application) ⭐ **Priority 1**
-2. [Admin & Manager Dashboard](#2-admin--manager-dashboard) ⭐ **Priority 2**
-3. [Staff Portal](#3-staff-portal) ⭐ **Priority 3**
-4. [Shipper Mobile App](#4-shipper-mobile-app) ⭐ **Priority 4**
+```
+PENDING → CONFIRMED → PICKED_UP → IN_PROGRESS → READY → DELIVERING → COMPLETED
+         ↓
+      CANCELLED
+```
+
+---
+
+## 📚 Chi tiết đầy đủ
+
+Xem documentation đầy đủ tại: **[docs/api/README.md](./docs/api/README.md)**
+
+---
+
+---
+
+# ⚠️ LƯU Ý: PHẦN DƯỚI ĐÂY SẼ BỊ XÓA SAU KHI MIGRATE XONG
+
+> File này giữ lại để reference trong quá trình migration.
+> Sau khi frontend team confirm đã migrate sang structure mới, phần dưới sẽ bị xóa.
 
 ---
 
