@@ -87,8 +87,11 @@ public class SecurityConfig {
                         // Admin only endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         
-                        // Staff and Admin endpoints
-                        .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN")
+                        // Manager endpoints (can manage orders, staff, reports)
+                        .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
+                        
+                        // Staff and above (Staff, Manager, Admin)
+                        .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "MANAGER", "ADMIN")
                         
                         // All other requests - allow authenticated OR anonymous (for testing)
                         .anyRequest().permitAll()

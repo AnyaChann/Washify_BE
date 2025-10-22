@@ -31,7 +31,7 @@ public class AuditLogController {
      * @return Danh sách AuditLogResponse
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Lấy tất cả audit logs",
         description = "Lấy toàn bộ nhật ký hoạt động, sắp xếp theo thời gian mới nhất. Chỉ ADMIN mới có quyền truy cập."
@@ -47,7 +47,7 @@ public class AuditLogController {
      * @return AuditLogResponse
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Lấy audit log theo ID",
         description = "Lấy thông tin chi tiết của một audit log. Chỉ ADMIN mới có quyền truy cập."
@@ -63,7 +63,7 @@ public class AuditLogController {
      * @return Danh sách AuditLogResponse
      */
     @GetMapping("/user/{userId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Lấy audit logs theo user",
         description = "Lấy tất cả nhật ký hoạt động của một user cụ thể. Chỉ ADMIN mới có quyền truy cập."
@@ -79,7 +79,7 @@ public class AuditLogController {
      * @return Danh sách AuditLogResponse
      */
     @GetMapping("/entity-type/{entityType}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Lấy audit logs theo loại entity",
         description = "Lấy nhật ký theo loại entity (Order, User, Payment, Service, etc.). Chỉ ADMIN mới có quyền truy cập."
@@ -96,7 +96,7 @@ public class AuditLogController {
      * @return Danh sách AuditLogResponse
      */
     @GetMapping("/entity/{entityType}/{entityId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Lấy audit logs của một entity cụ thể",
         description = "Lấy tất cả nhật ký thay đổi của một entity cụ thể (VD: Order #123). Chỉ ADMIN mới có quyền truy cập."
@@ -114,7 +114,7 @@ public class AuditLogController {
      * @return Danh sách AuditLogResponse
      */
     @GetMapping("/action/{action}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Lấy audit logs theo action",
         description = "Lấy nhật ký theo hành động (CREATE, UPDATE, DELETE). Chỉ ADMIN mới có quyền truy cập."
@@ -131,7 +131,7 @@ public class AuditLogController {
      * @return Danh sách AuditLogResponse
      */
     @GetMapping("/date-range")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Lấy audit logs theo khoảng thời gian",
         description = "Lấy nhật ký trong khoảng thời gian cụ thể. Format: yyyy-MM-dd'T'HH:mm:ss. Chỉ ADMIN mới có quyền truy cập."
@@ -151,7 +151,7 @@ public class AuditLogController {
      * @return Danh sách AuditLogResponse
      */
     @GetMapping("/user/{userId}/date-range")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Lấy audit logs của user theo khoảng thời gian",
         description = "Lấy nhật ký của một user trong khoảng thời gian cụ thể. Format: yyyy-MM-dd'T'HH:mm:ss. Chỉ ADMIN mới có quyền truy cập."
