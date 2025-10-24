@@ -19,7 +19,7 @@ import java.util.List;
  * Cung cấp các API để quản lý thông tin và trạng thái của shipper
  */
 @RestController
-@RequestMapping("/api/shippers")
+@RequestMapping("/shippers")
 @Tag(name = "Shipper Management", description = "APIs quản lý người giao hàng")
 public class ShipperController {
 
@@ -32,7 +32,7 @@ public class ShipperController {
      * @return ShipperResponse với status 201 Created
      */
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Tạo mới shipper",
         description = "Tạo tài khoản shipper mới. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
@@ -47,7 +47,7 @@ public class ShipperController {
      * @return Danh sách ShipperResponse
      */
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Lấy danh sách shipper",
         description = "Lấy danh sách tất cả shipper. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
@@ -62,7 +62,7 @@ public class ShipperController {
      * @return Danh sách ShipperResponse có isActive = true
      */
     @GetMapping("/active")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Lấy danh sách shippers đang hoạt động",
         description = "Lấy danh sách các shippers đang trong trạng thái hoạt động (isActive = true). Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
@@ -78,7 +78,7 @@ public class ShipperController {
      * @return ShipperResponse
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Lấy thông tin shipper theo ID",
         description = "Lấy thông tin chi tiết của một shipper. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
@@ -94,7 +94,7 @@ public class ShipperController {
      * @return Danh sách ShipperResponse phù hợp
      */
     @GetMapping("/phone/{phone}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Tìm shippers theo số điện thoại",
         description = "Tìm kiếm shippers có số điện thoại chứa từ khóa. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
@@ -110,7 +110,7 @@ public class ShipperController {
      * @return Danh sách ShipperResponse phù hợp
      */
     @GetMapping("/name/{name}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Tìm shippers theo tên",
         description = "Tìm kiếm shippers có tên chứa từ khóa (không phân biệt chữ hoa/thường). Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
@@ -126,7 +126,7 @@ public class ShipperController {
      * @return ShipperStatistics chứa tổng số shipments, hoàn thành, đang giao
      */
     @GetMapping("/{id}/statistics")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Lấy thống kê shipments của shipper",
         description = "Lấy thống kê số lượng shipments: tổng số, đã hoàn thành, đang giao hàng. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
@@ -143,7 +143,7 @@ public class ShipperController {
      * @return ShipperResponse đã được cập nhật
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Cập nhật thông tin shipper",
         description = "Cập nhật thông tin của shipper. Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
@@ -161,7 +161,7 @@ public class ShipperController {
      * @return ShipperResponse đã được kích hoạt
      */
     @PatchMapping("/{id}/activate")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Kích hoạt shipper",
         description = "Đặt trạng thái shipper thành active (isActive = true). Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
@@ -177,7 +177,7 @@ public class ShipperController {
      * @return ShipperResponse đã được vô hiệu hóa
      */
     @PatchMapping("/{id}/deactivate")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'STAFF', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF', 'MANAGER')")
     @Operation(
         summary = "Vô hiệu hóa shipper",
         description = "Đặt trạng thái shipper thành inactive (isActive = false). Yêu cầu quyền ADMIN, STAFF hoặc MANAGER."
@@ -193,7 +193,7 @@ public class ShipperController {
      * @return ResponseEntity với status 204 No Content
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
         summary = "Xóa shipper",
         description = "Xóa shipper khỏi hệ thống. Chỉ xóa được nếu shipper không có shipments đang giao. Yêu cầu quyền ADMIN."

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
  * Endpoints public, xác thực qua token trong email
  */
 @RestController
-@RequestMapping("/api/auth/security/2fa-toggle")
+@RequestMapping("/auth/security/2fa-toggle")
 @RequiredArgsConstructor
 @Tag(name = "🔑 Password Management", description = "Quên mật khẩu, đổi mật khẩu, reset password")
 public class PasswordChange2FAController {

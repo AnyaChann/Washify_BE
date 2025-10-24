@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/notifications")
+@RequestMapping("/notifications")
 @RequiredArgsConstructor
 @Tag(name = "🔔 Notifications", description = "Quản lý thông báo, đánh dấu đã đọc")
 @SecurityRequirement(name = "bearerAuth")

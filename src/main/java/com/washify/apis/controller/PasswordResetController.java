@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * Không cần authentication vì user quên mật khẩu
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "🔑 Password Management", description = "Quên mật khẩu, đổi mật khẩu, reset password")
 public class PasswordResetController {

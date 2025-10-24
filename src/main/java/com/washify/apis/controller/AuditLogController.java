@@ -19,7 +19,7 @@ import java.util.List;
  * CHỈ dành cho Admin - quan trọng cho security và compliance
  */
 @RestController
-@RequestMapping("/api/audit-logs")
+@RequestMapping("/audit-logs")
 @Tag(name = "Audit Log Management", description = "APIs quản lý nhật ký hoạt động hệ thống")
 public class AuditLogController {
 

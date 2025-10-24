@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Endpoints: /deleted, /restore, /permanent-delete
  */
 @RestController
-@RequestMapping("/api/soft-delete")
+@RequestMapping("/soft-delete")
 @RequiredArgsConstructor
 @io.swagger.v3.oas.annotations.tags.Tag(name = "🗑️ Soft Delete", description = "Quản lý soft delete, restore - 🔒 Admin only")
 public class SoftDeleteController {

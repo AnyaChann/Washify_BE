@@ -20,7 +20,7 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/auth/email")
+@RequestMapping("/auth/email")
 @RequiredArgsConstructor
 @Tag(name = "Email Verification", description = "Xác thực email hợp lệ, check format, MX records")
 public class EmailVerificationController {
