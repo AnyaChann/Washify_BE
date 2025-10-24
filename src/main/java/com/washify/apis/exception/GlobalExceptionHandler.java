@@ -214,6 +214,21 @@ public class GlobalExceptionHandler {
     }
     
     /**
+     * Xử lý StackOverflowError (thường do circular reference trong JSON serialization)
+     */
+    @ExceptionHandler(StackOverflowError.class)
+    public ResponseEntity<ApiResponse<Void>> handleStackOverflowError(StackOverflowError ex) {
+        log.error("StackOverflowError - likely circular reference: {}", ex.getMessage());
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.<Void>builder()
+                        .success(false)
+                        .message("Đã xảy ra lỗi hệ thống: Handler dispatch failed: java.lang.StackOverflowError")
+                        .timestamp(java.time.LocalDateTime.now())
+                        .build());
+    }
+    
+    /**
      * Xử lý tất cả exception khác
      */
     @ExceptionHandler(Exception.class)

@@ -1,5 +1,6 @@
 package com.washify.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,11 +24,13 @@ public class Review {
     private Long id;
     
     // Many-to-One: Nhiều reviews thuộc một order
+    @JsonIgnoreProperties({"orderItems", "payment", "shipment", "reviews", "promotions", "attachments"}) // Tránh circular reference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order; // Đơn hàng được đánh giá
     
     // Many-to-One: Nhiều reviews của một user
+    @JsonIgnoreProperties({"orders", "reviews", "notifications", "roles"}) // Tránh circular reference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // Người đánh giá

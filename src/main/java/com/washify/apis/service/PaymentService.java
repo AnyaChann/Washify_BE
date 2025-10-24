@@ -5,6 +5,7 @@ import com.washify.apis.dto.request.PaymentRequest;
 import com.washify.apis.dto.response.PaymentResponse;
 import com.washify.apis.entity.Order;
 import com.washify.apis.entity.Payment;
+import com.washify.apis.enums.OrderStatus;
 import com.washify.apis.repository.OrderRepository;
 import com.washify.apis.repository.PaymentRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -110,7 +111,7 @@ public class PaymentService {
         // Nếu thanh toán thành công, cập nhật trạng thái order
         if (status.equals("PAID")) {
             Order order = payment.getOrder();
-            order.setStatus(Order.OrderStatus.IN_PROGRESS);
+            order.setStatus(OrderStatus.PROCESSING);
             orderRepository.save(order);
         }
         
@@ -167,7 +168,7 @@ public class PaymentService {
         
         // Cập nhật order status về CANCELLED
         Order order = payment.getOrder();
-        order.setStatus(Order.OrderStatus.CANCELLED);
+        order.setStatus(OrderStatus.CANCELLED);
         order.setNotes(order.getNotes() + " | REFUND: " + reason);
         orderRepository.save(order);
         
@@ -214,7 +215,7 @@ public class PaymentService {
         
         // Nếu thanh toán thành công, cập nhật order status
         if (newStatus == Payment.PaymentStatus.PAID) {
-            order.setStatus(Order.OrderStatus.IN_PROGRESS);
+            order.setStatus(OrderStatus.PROCESSING);
             orderRepository.save(order);
         }
         
@@ -235,7 +236,7 @@ public class PaymentService {
             
             // Cập nhật order status
             Order order = payment.getOrder();
-            order.setStatus(Order.OrderStatus.IN_PROGRESS);
+            order.setStatus(OrderStatus.PROCESSING);
             orderRepository.save(order);
         } else if ("FAILED".equalsIgnoreCase(status) || "CANCELLED".equalsIgnoreCase(status)) {
             payment.setPaymentStatus(Payment.PaymentStatus.FAILED);

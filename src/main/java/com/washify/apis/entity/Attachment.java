@@ -1,6 +1,7 @@
 package com.washify.apis.entity;
 
 // Import các annotation JPA để map class với database table
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 // Import Lombok để tự động generate getters, setters, constructors
 import lombok.AllArgsConstructor;
@@ -31,6 +32,7 @@ public class Attachment {
      * Quan hệ Many-to-One với Order
      * Nhiều attachments có thể thuộc về một order
      */
+    @JsonIgnoreProperties({"orderItems", "payment", "shipment", "reviews", "promotions", "attachments"}) // Tránh circular reference
     @ManyToOne(fetch = FetchType.LAZY) // Lazy loading: chỉ load Order khi thực sự cần thiết (tối ưu performance)
     @JoinColumn(name = "order_id") // Tên cột foreign key trong bảng attachments
     private Order order; // Đơn hàng mà file này được đính kèm (nullable - có thể null)
@@ -39,6 +41,7 @@ public class Attachment {
      * Quan hệ Many-to-One với Shipment
      * Nhiều attachments có thể thuộc về một shipment
      */
+    @JsonIgnoreProperties({"order", "attachments"}) // Tránh circular reference
     @ManyToOne(fetch = FetchType.LAZY) // Lazy loading: chỉ load Shipment khi cần
     @JoinColumn(name = "shipment_id") // Tên cột foreign key trong bảng attachments
     private Shipment shipment; // Đơn giao hàng mà file này được đính kèm (nullable - có thể null)

@@ -1,5 +1,6 @@
 package com.washify.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -48,12 +49,14 @@ public class OrderPromotion implements Serializable {
     private OrderPromotionId id;
     
     // Many-to-One: Nhiều order_promotions thuộc một order
+    @JsonIgnoreProperties({"orderItems", "payment", "shipment", "reviews", "promotions", "attachments"}) // Tránh circular reference
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("orderId") // Map với orderId trong composite key
     @JoinColumn(name = "order_id")
     private Order order;
     
     // Many-to-One: Nhiều order_promotions thuộc một promotion
+    @JsonIgnoreProperties({"orders"}) // Tránh circular reference
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("promotionId") // Map với promotionId trong composite key
     @JoinColumn(name = "promotion_id")

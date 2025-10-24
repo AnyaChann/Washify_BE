@@ -216,7 +216,7 @@ INSERT INTO orders (order_code, user_id, branch_id, order_date, status, total_am
 
 -- Đơn hàng 2: Đang xử lý
 INSERT INTO orders (order_code, user_id, branch_id, order_date, status, total_amount, notes) VALUES
-('WF202510190001', 7, 2, DATE_SUB(NOW(), INTERVAL 2 DAY), 'IN_PROGRESS', 300000.00, 'Không dùng nước xả vải');
+('WF202510190001', 7, 2, DATE_SUB(NOW(), INTERVAL 2 DAY), 'PROCESSING', 300000.00, 'Không dùng nước xả vải');
 
 -- Đơn hàng 3: Chờ xử lý
 INSERT INTO orders (order_code, user_id, branch_id, order_date, status, total_amount) VALUES

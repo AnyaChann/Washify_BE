@@ -6,6 +6,7 @@ import com.washify.apis.entity.Order;
 import com.washify.apis.entity.Shipment;
 import com.washify.apis.entity.Shipper;
 import com.washify.apis.entity.User;
+import com.washify.apis.enums.OrderStatus;
 import com.washify.apis.repository.OrderRepository;
 import com.washify.apis.repository.ShipmentRepository;
 import com.washify.apis.repository.ShipperRepository;
@@ -122,7 +123,7 @@ public class ShipmentService {
         // Nếu giao hàng thành công, cập nhật trạng thái order
         if (status.equals("DELIVERED")) {
             Order order = shipment.getOrder();
-            order.setStatus(Order.OrderStatus.COMPLETED);
+            order.setStatus(OrderStatus.COMPLETED);
             orderRepository.save(order);
         }
         

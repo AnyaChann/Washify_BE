@@ -1,9 +1,11 @@
 package com.washify.apis.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.washify.apis.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
@@ -23,12 +25,14 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Only use specific fields for equals/hashCode
 @SQLDelete(sql = "UPDATE orders SET deleted_at = NOW() WHERE id = ?") // Soft delete
 @Where(clause = "deleted_at IS NULL") // Chỉ query các record chưa bị xóa
 public class Order {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Include ID in equals/hashCode
     private Long id;
     
     @Column(name = "order_code", unique = true, nullable = false, length = 50)
@@ -95,14 +99,4 @@ public class Order {
     @JsonIgnore // Tránh circular reference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private Set<Attachment> attachments = new HashSet<>();
-    
-    /**
-     * Enum định nghĩa các trạng thái của đơn hàng
-     */
-    public enum OrderStatus {
-        PENDING,      // Chờ xử lý
-        IN_PROGRESS,  // Đang xử lý
-        COMPLETED,    // Hoàn thành
-        CANCELLED     // Đã hủy
-    }
 }

@@ -19,12 +19,13 @@ import java.util.List;
 public class OrderResponse {
     
     private Long id;
+    private String orderCode; // Mã đơn hàng (VD: WF202510210001)
     private Long userId;
     private String userName;
     private Long branchId;
     private String branchName;
     private LocalDateTime orderDate;
-    private String status; // PENDING, IN_PROGRESS, COMPLETED, CANCELLED
+    private String status; // PENDING, CONFIRMED, PROCESSING, READY, DELIVERING, COMPLETED, CANCELLED, REFUNDED
     private BigDecimal totalAmount;
     private String notes;
     private List<OrderItemResponse> items;

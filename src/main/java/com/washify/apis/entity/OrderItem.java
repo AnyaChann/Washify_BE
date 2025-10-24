@@ -1,8 +1,10 @@
 package com.washify.apis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -15,13 +17,16 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Only use specific fields for equals/hashCode
 public class OrderItem {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Include ID in equals/hashCode
     private Long id;
     
     // Many-to-One: Nhiều order items thuộc một order
+    @JsonIgnoreProperties({"orderItems", "payment", "shipment", "reviews", "promotions", "attachments"}) // Tránh circular reference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order; // Đơn hàng chứa item này

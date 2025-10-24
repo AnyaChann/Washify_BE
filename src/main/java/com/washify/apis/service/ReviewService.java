@@ -5,6 +5,7 @@ import com.washify.apis.dto.response.ReviewResponse;
 import com.washify.apis.entity.Order;
 import com.washify.apis.entity.Review;
 import com.washify.apis.entity.User;
+import com.washify.apis.enums.OrderStatus;
 import com.washify.apis.repository.OrderRepository;
 import com.washify.apis.repository.ReviewRepository;
 import com.washify.apis.repository.UserRepository;
@@ -45,7 +46,7 @@ public class ReviewService {
         }
         
         // Kiểm tra đơn hàng đã hoàn thành chưa
-        if (order.getStatus() != Order.OrderStatus.COMPLETED) {
+        if (order.getStatus() != OrderStatus.COMPLETED) {
             throw new RuntimeException("Chỉ có thể đánh giá đơn hàng đã hoàn thành");
         }
         

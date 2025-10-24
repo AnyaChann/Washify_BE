@@ -2,6 +2,9 @@ package com.washify.apis.aspect;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.washify.apis.annotation.Audited;
 import com.washify.apis.entity.AuditLog;
 import com.washify.apis.entity.User;
@@ -35,16 +38,20 @@ import java.lang.reflect.Method;
  * @author Washify Team
  */
 @Aspect
-@Component
+//@Component // Temporarily disabled to avoid StackOverflowError during debugging
 @RequiredArgsConstructor
 @Slf4j
 public class AuditLogAspect {
-
+    
     private final AuditLogRepository auditLogRepository;
     private final UserRepository userRepository;
-    private final ObjectMapper objectMapper;
-
-    /**
+    
+    // Create a safe ObjectMapper for audit logging to avoid circular references
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);    /**
      * Advice chạy sau khi method có @Audited return successfully
      * 
      * @param joinPoint Thông tin về method được intercept
@@ -148,7 +155,8 @@ public class AuditLogAspect {
     }
     
     /**
-     * Serialize object thành JSON string
+     * Serialize object thành JSON string với safe handling
+     * Tránh circular reference và StackOverflowError
      */
     private String serializeToJson(Object obj) {
         if (obj == null) {
@@ -156,9 +164,21 @@ public class AuditLogAspect {
         }
         
         try {
+            // For simple types, just return toString
+            if (obj instanceof String || obj instanceof Number || obj instanceof Boolean) {
+                return obj.toString();
+            }
+            
+            // Try JSON serialization with safe ObjectMapper
             return objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            log.error("Failed to serialize object to JSON", e);
+            log.warn("Failed to serialize object to JSON: {}", e.getMessage());
+            return obj.toString();
+        } catch (StackOverflowError e) {
+            log.error("StackOverflowError during JSON serialization, skipping: {}", e.getMessage());
+            return "StackOverflowError - circular reference detected";
+        } catch (Exception e) {
+            log.error("Unexpected error during JSON serialization: {}", e.getMessage(), e);
             return obj.toString();
         }
     }

@@ -1,7 +1,10 @@
 package com.washify.apis.repository;
 
 import com.washify.apis.entity.Order;
+import com.washify.apis.entity.OrderItem;
+import com.washify.apis.entity.Promotion;
 import com.washify.apis.entity.User;
+import com.washify.apis.enums.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Repository interface cho Order entity
@@ -40,7 +44,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param status Trạng thái đơn hàng
      * @return Danh sách orders
      */
-    List<Order> findByStatus(Order.OrderStatus status);
+    List<Order> findByStatus(OrderStatus status);
     
     /**
      * Tìm orders của user theo trạng thái
@@ -48,7 +52,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param status Trạng thái đơn hàng
      * @return Danh sách orders
      */
-    List<Order> findByUserIdAndStatus(Long userId, Order.OrderStatus status);
+    List<Order> findByUserIdAndStatus(Long userId, OrderStatus status);
     
     /**
      * Tìm orders trong khoảng thời gian
@@ -73,18 +77,35 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByOrderCode(String orderCode);
     
     /**
-     * Tìm order theo ID với eager loading
+     * Tìm order theo ID với basic eager loading (chỉ user và branch)
      * @param id ID của order
-     * @return Optional<Order> với collections đã load
+     * @return Optional<Order> với basic info đã load
      */
     @Query("SELECT DISTINCT o FROM Order o " +
            "LEFT JOIN FETCH o.user " +
            "LEFT JOIN FETCH o.branch " +
-           "LEFT JOIN FETCH o.orderItems oi " +
-           "LEFT JOIN FETCH oi.service " +
-           "LEFT JOIN FETCH o.promotions " +
            "WHERE o.id = :id")
     Optional<Order> findByIdWithDetails(@Param("id") Long id);
+    
+    /**
+     * Lấy order items của một order
+     * @param orderId ID của order
+     * @return List<OrderItem>
+     */
+    @Query("SELECT oi FROM OrderItem oi " +
+           "LEFT JOIN FETCH oi.service " +
+           "WHERE oi.order.id = :orderId")
+    List<OrderItem> findOrderItemsByOrderId(@Param("orderId") Long orderId);
+    
+    /**
+     * Lấy promotions của một order
+     * @param orderId ID của order
+     * @return Set<Promotion>
+     */
+    @Query("SELECT p FROM Promotion p " +
+           "INNER JOIN p.orders o " +
+           "WHERE o.id = :orderId")
+    Set<Promotion> findPromotionsByOrderId(@Param("orderId") Long orderId);
     
     /**
      * Tính tổng doanh thu theo trạng thái
@@ -92,14 +113,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @return Tổng doanh thu
      */
     @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.status = :status")
-    Double sumTotalAmountByStatus(@Param("status") Order.OrderStatus status);
+    Double sumTotalAmountByStatus(@Param("status") OrderStatus status);
     
     /**
      * Đếm số orders theo trạng thái
      * @param status Trạng thái đơn hàng
      * @return Số lượng orders
      */
-    long countByStatus(Order.OrderStatus status);
+    long countByStatus(OrderStatus status);
     
     // ========================================
     // PHASE 3: STATISTICS QUERIES
@@ -161,7 +182,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> searchOrders(
         @Param("userId") Long userId,
         @Param("branchId") Long branchId,
-        @Param("status") Order.OrderStatus status,
+        @Param("status") OrderStatus status,
         @Param("dateFrom") LocalDateTime dateFrom,
         @Param("dateTo") LocalDateTime dateTo,
         @Param("minAmount") Double minAmount,
